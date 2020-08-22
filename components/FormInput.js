@@ -20,6 +20,8 @@ const FormInput = ({
       placeholderTextColor='grey'
       name={name}
       placeholder={placeholder}
+      keyboardType={keyboardType}
+      returnKeyType={returnKeyType}
       style={styles.input}
     />
   </View>

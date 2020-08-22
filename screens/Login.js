@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react'
-import axios from 'axios'
 import { StyleSheet, SafeAreaView, View, AsyncStorage } from 'react-native'
 import { Button } from 'react-native-elements'
 import { Formik } from 'formik'
@@ -7,6 +6,7 @@ import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
+import { api } from '../common/Api'
 import { baseurl, login } from '../common/Constant'
 
 const validationSchema = Yup.object().shape({
@@ -21,28 +21,28 @@ const validationSchema = Yup.object().shape({
 export default class Login extends React.Component {
   goToSignup = () => this.props.navigation.navigate('Signup')
 
-  //handleSubmit = values => {
-  handleSubmit = async (values) => {  
+  handleSubmit = async values => {  
     let self = this;
     console.log (values)
     if (values.phone.length > 0 && values.password.length > 0) {
-     axios.post(baseurl + login, {
+      const postBody = {
         phone: values.phone,
         password: values.password
-      })
-      .then(async function (response) {
+      }
+      api(postBody, baseurl + login, 'POST', null).then(async (response)=>{
         console.log(response);
         if (response.data.success === 1) {
           console.log(response.data.id);
           await AsyncStorage.setItem('userId', response.data.id);
           await AsyncStorage.setItem('phone', response.data.phone);
-          self.props.navigation.navigate('App')
+          await AsyncStorage.setItem('dashboard', response.data.dashboard);
+          //self.props.navigation.navigate('App')
+          response.data.dashboard !== "0" ? self.props.navigation.navigate('Dashboard') : self.props.navigation.navigate('App')
         }
         else {
           alert (response.data.message)
         }
-      })
-      .catch(function (error) {
+      }).catch(function (error) {
         console.log(error);
       });
     }
@@ -76,7 +76,9 @@ export default class Login extends React.Component {
                 iconName='ios-phone-portrait'
                 iconColor='#2C384A'
                 onBlur={handleBlur('phone')}
-                autoFocus
+                keyboardType={'number-pad'}
+                returnKeyType={'next'}
+                //autoFocus
               />
               <ErrorMessage errorValue={touched.phone && errors.phone} />
               
