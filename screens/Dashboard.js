@@ -1,10 +1,10 @@
 import React from 'react'
 import { StyleSheet, Text, View, AsyncStorage } from 'react-native'
-import { Button } from 'react-native-elements'
+import FormButton from '../components/FormButton'
 
 export default class Dashboard extends React.Component {
   static navigationOptions = {
-    title: 'Dashboard',
+    title: 'Dashboard Screen',
     headerLeft: null
   };
 
@@ -15,8 +15,14 @@ export default class Dashboard extends React.Component {
   render() {
     return (
       <View>
-        <Text>Dashboard Screen</Text>
-        <Button title="sign me out" onPress={this.signOutAsync} />
+        <FormButton
+          buttonType='outline'
+          title='Sign Out'
+          buttonColor='#F57C00'
+          onPress={this.signOutAsync}
+          buttonStyle = {styles.button}
+          style={styles.button}
+        />
       </View>
     )
   }

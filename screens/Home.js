@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, View, AsyncStorage } from 'react-native'
-import { Button } from 'react-native-elements'
+import FormButton from '../components/FormButton'
 
 export default class Home extends React.Component {
   static navigationOptions = {
@@ -23,9 +23,30 @@ export default class Home extends React.Component {
     return (
       <View>
         <View style={styles.buttonContainer}>
-          <Button style={styles.button} title="Business" onPress ={() => this.addKhata('2')} />
-          <Button style={styles.button} title="Personal" onPress ={() => this.addKhata('1')} />
-          <Button style={styles.button} title="sign me out" onPress={this.signOutAsync} />
+          <FormButton
+            buttonType='outline'
+            title='Business'
+            buttonColor='#F57C00'
+            onPress ={() => this.addKhata('2')}
+            buttonStyle = {styles.button}
+            style={styles.button}
+          />
+          <FormButton
+            buttonType='outline'
+            title='Personal'
+            buttonColor='#F57C00'
+            onPress ={() => this.addKhata('1')}
+            buttonStyle = {styles.button}
+            style={styles.button}
+          />
+          <FormButton
+            buttonType='outline'
+            title='Sign Out'
+            buttonColor='#F57C00'
+            onPress={this.signOutAsync}
+            buttonStyle = {styles.button}
+            style={styles.button}
+          />
         </View>
       </View>
     )
