@@ -22,7 +22,7 @@ export default class AuthLoadingScreen extends React.Component {
     if (userToken && userDashboard === "0") {
       this.props.navigation.navigate('App');
     } else if (userToken && userDashboard !== "0") {
-      this.props.navigation.navigate('App');
+      this.props.navigation.navigate('Dashboard');
     } else {
       this.props.navigation.navigate('Login');
     }

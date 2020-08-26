@@ -19,6 +19,13 @@ const validationSchema = Yup.object().shape({
     .min(2, 'Must have at least 2 characters')
 })
 
+const validationSchemaPersonal = Yup.object().shape({
+  name: Yup.string()
+    .label('Name')
+    .required()
+    .min(2, 'Must have at least 2 characters'),
+})
+
 export default class AddKhata extends React.Component {
 
   static navigationOptions = {
@@ -28,16 +35,16 @@ export default class AddKhata extends React.Component {
   handleSubmit = async values  => {
     let self = this;
     console.log (values)
-    if (values.name.length > 0 && values.business.length > 0) {
+    const khataType = this.props.navigation.getParam('khataType','default')
+    if (khataType === 2 ? values.name.length > 0 && values.business.length > 0 : values.name.length > 0) {
       const userToken = await AsyncStorage.getItem('userId');
-      const khataType = this.props.navigation.getParam('khataType','default')
       const postBody = {
         userid:userToken,
         name: values.name,
-        businessname: values.business,
+        businessname: khataType === 2 ? values.business : '',
         type:khataType
       }
-      //console.log (postBody)
+      console.log (postBody)
       api(postBody, baseurl + addkhata, 'POST', null).then(async (response)=>{
         console.log(response);
         if (response.data.success === 1) {
@@ -59,6 +66,8 @@ export default class AddKhata extends React.Component {
   }
 
   render() {
+    const khataType = this.props.navigation.getParam('khataType','default')
+    //console.log ('khataType',khataType)
     return (
       <SafeAreaView style={styles.container}>
         <Formik
@@ -69,7 +78,7 @@ export default class AddKhata extends React.Component {
           onSubmit={values => {
             this.handleSubmit(values)
           }}
-          validationSchema={validationSchema}>
+          validationSchema={khataType === "2" ? validationSchema : validationSchemaPersonal}>
           {({
             handleChange,
             values,
@@ -92,17 +101,22 @@ export default class AddKhata extends React.Component {
                 //autoFocus
               />
               <ErrorMessage errorValue={touched.name && errors.name} />
-              <FormInput
-                name='business'
-                value={values.business}
-                onChangeText={handleChange('business')}
-                placeholder='Business Name'
-                iconName='md-person'
-                iconColor='#2C384A'
-                onBlur={handleBlur('business')}
-                //autoFocus
-              />
-              <ErrorMessage errorValue={touched.business && errors.business} />
+              {khataType === "2" ? 
+              <React.Fragment>
+                <FormInput
+                  name='business'
+                  value={values.business}
+                  onChangeText={handleChange('business')}
+                  placeholder='Business Name'
+                  iconName='md-person'
+                  iconColor='#2C384A'
+                  onBlur={handleBlur('business')}
+                  //autoFocus
+                />
+                <ErrorMessage errorValue={touched.business && errors.business} />
+              </React.Fragment>
+              : ''
+              }
               <View style={styles.buttonContainer}>
                 <FormButton
                   buttonType='outline'
