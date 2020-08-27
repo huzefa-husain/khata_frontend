@@ -6,7 +6,7 @@ import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
 import { api } from '../common/Api'
-import { baseurl, addkhata } from '../common/Constant'
+import { baseurl, addkhata, editkhata } from '../common/Constant'
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -28,57 +28,70 @@ const validationSchemaPersonal = Yup.object().shape({
 
 export default class AddKhata extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      khataTypeID: this.props.navigation.getParam('typeid','default'),
+      khataname: this.props.navigation.getParam('khataname','default'),
+      khatatype: this.props.navigation.getParam('khatatype','default'),
+      mode: this.props.navigation.getParam('mode','default')
+    }
+  }
+
   static navigationOptions = {
     title: 'Add New Khata'
   };
 
+  addKhata = async (values) => {
+    const userToken = await AsyncStorage.getItem('userId');
+    const mode = this.props.navigation.getParam('mode','default')
+    const apiurl = mode === 'edit' ? editkhata : addkhata
+    const apimethod = mode === 'edit' ? 'PUT' : 'POST'
+
+    const postBody = {
+      userid:userToken,
+      name: values.name,
+      businessname: this.state.khataTypeID === 2 ? values.business : '',
+      type:this.state.khataTypeID
+    }
+    console.log (postBody)
+    console.log (userToken,mode,apiurl,apimethod )
+    /*api(postBody, baseurl + apiurl, apimethod, null).then(async (response)=>{
+      console.log(response);
+      if (response.data.success === 1) {
+        self.props.navigation.navigate('Dashboard')
+      }
+      else {
+        alert (response.data.message)
+      }
+      }).catch(function (error) {
+      console.log(error);
+    });*/
+  }
+
   handleSubmit = async values  => {
     let self = this;
     console.log (values)
-    const khataType = this.props.navigation.getParam('khataType','default')
-    if (khataType === 2 ? values.name.length > 0 && values.business.length > 0 : values.name.length > 0) {
-      const userToken = await AsyncStorage.getItem('userId');
-      const postBody = {
-        userid:userToken,
-        name: values.name,
-        businessname: khataType === 2 ? values.business : '',
-        type:khataType
-      }
-      console.log (postBody)
-      api(postBody, baseurl + addkhata, 'POST', null).then(async (response)=>{
-        console.log(response);
-        if (response.data.success === 1) {
-          self.props.navigation.navigate('Dashboard')
-          //console.log(response.data.id);
-          //await AsyncStorage.setItem('userId', response.data.id);
-          //await AsyncStorage.setItem('phone', response.data.phone);
-          //await AsyncStorage.setItem('dashboard', response.data.dashboard);
-          
-          //response.data.dashboard === "0" ? self.props.navigation.navigate('App') : self.props.navigation.navigate('Dashboard')
-        }
-        else {
-          alert (response.data.message)
-        }
-      }).catch(function (error) {
-        console.log(error);
-      });
+    if (this.state.khataTypeID === 2 ? values.name.length > 0 && values.business.length > 0 : values.name.length > 0) {
+      self.addKhata(values);
     }
   }
 
   render() {
-    const khataType = this.props.navigation.getParam('khataType','default')
-    //console.log ('khataType',khataType)
+    const { khataTypeID, khataname, khatatype, mode } = this.state
+    //console.log ('mode',mode)
+    console.log ('mode type',khataname)
     return (
       <SafeAreaView style={styles.container}>
         <Formik
           initialValues={{
-            name: '',
-            business: '',
+            name: mode === 'edit' ? khataname : '',
+            business: mode === 'edit' ? khatatype : '',
           }}
           onSubmit={values => {
             this.handleSubmit(values)
           }}
-          validationSchema={khataType === "2" ? validationSchema : validationSchemaPersonal}>
+          validationSchema={khataTypeID === "2" && mode === "edit" ? validationSchema : validationSchemaPersonal}>
           {({
             handleChange,
             values,
@@ -101,7 +114,7 @@ export default class AddKhata extends React.Component {
                 //autoFocus
               />
               <ErrorMessage errorValue={touched.name && errors.name} />
-              {khataType === "2" ? 
+              {khataTypeID === "2" && mode === "edit" ? 
               <React.Fragment>
                 <FormInput
                   name='business'
