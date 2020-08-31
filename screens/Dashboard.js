@@ -12,7 +12,7 @@ const HeaderTitle = props => {
   return (
   <React.Fragment> 
     <Text>{props.title}</Text>
-    {props.type && props.type !== "" ? <Text> | {props.type}</Text> : ''}
+    {props.businessName && props.businessName !== "" ? <Text> | {props.businessName}</Text> : ''}
   </React.Fragment> 
   );
 }
@@ -21,7 +21,7 @@ const HeaderTitle = props => {
 
 const Edit = (props) => {
   const navigation = props.nav;
-  console.log (props.type)
+  //console.log (props.type)
   return (
     <View>
         <Icon name={'edit'}
@@ -33,7 +33,7 @@ const Edit = (props) => {
                   mode: 'edit',
                   typeid: props.type,
                   khataname: props.khataname,
-                  khatatype: props.khatatype
+                  businessname: props.businessName
                 })
               }}
         />
@@ -44,6 +44,7 @@ const Edit = (props) => {
 
 const DropDown = props => {
   //console.log (props.action)
+  const navigation = props.nav;
   return (
     <React.Fragment>
         <Menu /*onSelect={(value)  => props.action(value)}*/>
@@ -65,6 +66,11 @@ const DropDown = props => {
                 );
               })
             }
+            <MenuOption>
+              <FormButton buttonType='outline' title='Add Khata' buttonColor='#F57C00' onPress={() => {
+                navigation('Home') }}
+              />
+            </MenuOption>
           </MenuOptions>
         </Menu>
     </React.Fragment>
@@ -75,10 +81,8 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      khataid:"9",
+      //khataid:null,
       khataData:null,
-      khataName:null,
-      khataType:null,
       loading:false
     }
   }
@@ -86,45 +90,64 @@ class Dashboard extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <HeaderTitle title={params.screenTitle} type={params.screenType} /> : '' ,
+      headerTitle: params ? <HeaderTitle title={params.screenTitle} businessName={params.businessName} /> : '' ,
       headerLeft: null,
       headerRight: params ? <React.Fragment> 
-        <Edit nav={params.screenNav} type={params.typeId} khataname={params.screenTitle} khatatype={params.screenType} /> 
-        <DropDown action={params.dropButton} khatadata={params.screenData} /> 
+        <Edit nav={params.screenNav} type={params.typeId} khataname={params.screenTitle} businessName={params.businessName} khataId={params.khataId} /> 
+        <DropDown action={params.dropButton} khatadata={params.screenData} nav={params.screenNav} /> 
         </React.Fragment> : ''
     }
   };
 
-  componentDidMount() {
+  displayStorage = async () => {
+    AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (error, stores) => {
+        stores.map((result, i, store) => {
+          console.log({ [store[i][0]]: store[i][1] });
+          return true;
+        });
+      });
+    });
+  }
+
+  setParam = async () => {
     this.props.navigation.setParams({ dropButton: this._dropButton });
-    this.getDashboard(this.state.khataid);
+
+    const value = await AsyncStorage.getItem('khataName');
+    const businessname = await AsyncStorage.getItem('businessName');
+    const typeID = await AsyncStorage.getItem('TypeId');
+    const khataid = await AsyncStorage.getItem('KhataId');
+
+    this.getDashboard(value, khataid, businessname, typeID);
     this.props.navigation.setParams({
       screenNav:this.props.navigation.navigate,
+      businessName: businessname,
+      screenTitle:value,
+      typeId:typeID,
+      khataId:khataid
     })
   }
 
-  _dropButton = async (value, id, type, typeID) => {
-    //console.log (type)
-
-    await AsyncStorage.setItem('khataName', value);
-    await AsyncStorage.setItem('khataType', type);
-    await AsyncStorage.setItem('TypeId', typeID);
-
-    const getKhataName = await AsyncStorage.getItem('khataName');
-    const getkhataType = await AsyncStorage.getItem('khataType');
-    const getTypeId = await AsyncStorage.getItem('TypeId');
-
-    this.props.navigation.setParams({
-      screenTitle: getKhataName,
-      screenType: getkhataType,
-      typeId:getTypeId
-    })
-
-    this.getDashboard(id);
+  componentDidMount = async () => {
+    this.displayStorage();
+    this.focusListner = this.props.navigation.addListener("didFocus",() => {
+      // Update your data
+      this.setParam();
+    });
   }
 
-  getDashboard = async khataid => {
+  componentWillUnmount() {
+    // remove event listener
+    this.focusListner.remove();
+  }
+
+  _dropButton = async (value, khataid, businessname, typeID) => {
+    this.getDashboard(value, khataid, businessname, typeID);
+  }
+
+  getDashboard = async ( value, khataid, businessname,  typeID) => {
     const userToken = await AsyncStorage.getItem('userId');
+    const getKhataId = await AsyncStorage.getItem('KhataId');
     const postBody = {
       userid:userToken,
       khataid: khataid,
@@ -132,43 +155,52 @@ class Dashboard extends React.Component {
     this.setState({
       loading: true,
     });
+    
     api(postBody, baseurl + dashboard, 'POST', null).then(async (response)=>{
       console.log(response);
       if (response.data) {
         this.setState({
           khataData: response.data.khatalist,
-          //khataName:response.data.khatalist[0].name,
-          //khataType:response.data.khatalist[0].businessname
           loading:false
         });
 
-        this.props.navigation.setParams({
-          screenData:this.state.khataData
-        })
+        if (value !== undefined || khataid !== undefined || businessname !== undefined || typeID !== undefined) {
+          await AsyncStorage.setItem('khataName', value);
+          await AsyncStorage.setItem('businessName', businessname);
+          await AsyncStorage.setItem('TypeId', typeID);
+          await AsyncStorage.setItem('KhataId', khataid);
 
-        const getKhataName = await AsyncStorage.getItem('khataName');
-        const getkhataType = await AsyncStorage.getItem('khataType');
-        const getTypeId = await AsyncStorage.getItem('TypeId');
+          const getKhataName = await AsyncStorage.getItem('khataName');
+          const getBusinessName = await AsyncStorage.getItem('businessName');
+          const getTypeId = await AsyncStorage.getItem('TypeId');
+          const getKhataId = await AsyncStorage.getItem('KhataId');
 
-        if (getKhataName === null || getkhataType === null || getTypeId === null) {
-          console.log ('from api',getTypeId)
-          await AsyncStorage.setItem('khataName', response.data.khatalist[0].name);
-          await AsyncStorage.setItem('khataType', response.data.khatalist[0].businessname);
-          await AsyncStorage.setItem('TypeId', response.data.khatalist[0].type);
           this.props.navigation.setParams({
             screenTitle: getKhataName,
-            screenType: getkhataType,
+            businessName: getBusinessName,
             typeId:getTypeId,
+            khataId:getKhataId,
+            screenData:this.state.khataData
+          })
+        } else {
+          await AsyncStorage.setItem('khataName', response.data.khatalist[0].name);
+          await AsyncStorage.setItem('businessName', response.data.khatalist[0].businessname);
+          await AsyncStorage.setItem('TypeId', response.data.khatalist[0].type);
+          await AsyncStorage.setItem('KhataId', response.data.khatalist[0].id);
+
+          const getKhataName = await AsyncStorage.getItem('khataName');
+          const getBusinessName = await AsyncStorage.getItem('businessName');
+          const getTypeId = await AsyncStorage.getItem('TypeId');
+          const getKhataId = await AsyncStorage.getItem('KhataId');
+
+          this.props.navigation.setParams({
+            screenTitle: getKhataName,
+            businessName: getBusinessName,
+            typeId:getTypeId,
+            khataId:getKhataId,
+            screenData:this.state.khataData
           })
         }
-
-        this.props.navigation.setParams({
-          screenTitle: getKhataName,
-          screenType: getkhataType,
-          typeId:getTypeId,
-          screenData:this.state.khataData
-        })
-        //console.log(response.data);
       }
       else {
         //alert (response.data.message)
@@ -179,13 +211,13 @@ class Dashboard extends React.Component {
   };
 
   signOutAsync = async () => {
-    await AsyncStorage.clear();
+    await AsyncStorage.removeItem('userId')
     this.props.navigation.navigate('Auth');
   };
 
   render() {
     const { khataData, khataName, loading } = this.state
-    //console.log (khataName)
+    this.displayStorage();
     return (
       <React.Fragment>
         <View style={styles.container}> 

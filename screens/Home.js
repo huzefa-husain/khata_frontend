@@ -9,17 +9,29 @@ export default class Home extends React.Component {
   };
 
   signOutAsync = async () => {
-    await AsyncStorage.clear();
+    //await AsyncStorage.clear();
+    await AsyncStorage.removeItem('userId')
     this.props.navigation.navigate('Auth');
   };
   addKhata = async (type) => {
     console.log (type)
     //this.props.navigation.navigate('AddKhata');
     this.props.navigation.navigate('AddKhata', {  
-      khataType: type 
+      typeid: type 
     })  
   };
+  displayStorage = async () => {
+    AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (error, stores) => {
+        stores.map((result, i, store) => {
+          console.log({ [store[i][0]]: store[i][1] });
+          return true;
+        });
+      });
+    });
+  }
   render() {
+    this.displayStorage();
     return (
       <View>
         <View style={styles.buttonContainer}>
@@ -39,6 +51,16 @@ export default class Home extends React.Component {
             buttonStyle = {styles.button}
             style={styles.button}
           />
+
+          <FormButton
+            buttonType='outline'
+            title='Dashboard'
+            buttonColor='#F57C00'
+            onPress ={() => this.props.navigation.navigate('Dashboard')}
+            buttonStyle = {styles.button}
+            style={styles.button}
+          />
+
           <FormButton
             buttonType='outline'
             title='Sign Out'

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import axios from 'axios'
-import { StyleSheet, SafeAreaView, View } from 'react-native'
+import { StyleSheet, SafeAreaView, View, AsyncStorage } from 'react-native'
 import { Button } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -25,7 +25,7 @@ const validationSchema = Yup.object().shape({
 export default class Signup extends React.Component {
   goToLogin = () => this.props.navigation.navigate('Login')
 
-  handleSubmit = values => {
+  handleSubmit = async values => {  
     let self = this;
     console.log (values)
     if (values.name.length > 0 && values.phone.length > 0 && values.password.length > 0) {
@@ -34,9 +34,11 @@ export default class Signup extends React.Component {
         phone: values.phone,
         password: values.password
       })
-      .then(function (response) {
+      .then(async function (response) {
         console.log(response);
         if (response.data.success === 1) {
+          await AsyncStorage.setItem('userId', response.data.id);
+          await AsyncStorage.setItem('dashboard', response.data.dashboard);
           self.props.navigation.navigate('App')
         } else {
           alert (response.data.message)
@@ -45,13 +47,22 @@ export default class Signup extends React.Component {
       .catch(function (error) {
         console.log(error);
       });
-      /*setTimeout(() => {
-        this.props.navigation.navigate('App')
-      }, 3000)*/
     }
   }
 
+  displayStorage = async () => {
+    AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (error, stores) => {
+        stores.map((result, i, store) => {
+          console.log({ [store[i][0]]: store[i][1] });
+          return true;
+        });
+      });
+    });
+  }
+
   render() {
+    this.displayStorage();
     return (
       <SafeAreaView style={styles.container}>
         <Formik
