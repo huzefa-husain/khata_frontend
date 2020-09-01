@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
+import { Icon } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
@@ -7,7 +8,7 @@ import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
-import { baseurl, addkhata, editkhata } from '../common/Constant'
+import { baseurl, addkhata, editkhata, deletekhata } from '../common/Constant'
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -27,6 +28,28 @@ const validationSchemaPersonal = Yup.object().shape({
     .min(2, 'Must have at least 2 characters'),
 })
 
+const ScreenHeader = props => {
+  //console.log ('header',props.mode)
+  return (
+    <View>
+    <Text>
+      <h4>{props.mode === 'edit' ? 'Edit Khata' : 'Add New Khata'}</h4>
+    </Text>
+  </View>
+  )
+}
+
+const Delete = props => {
+  console.log ('delete',props.mode)
+  return (
+    <View>
+      {<Icon name={'trash'} type={'entypo'} size={20} color='#000'
+      onPress={() => {props.action()}}
+      />}
+    </View>
+  )
+}
+
 export default class AddKhata extends React.Component {
 
   constructor(props) {
@@ -40,9 +63,33 @@ export default class AddKhata extends React.Component {
     }
   }
 
-  static navigationOptions = {
-    title: 'Add New Khata'
+  static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state;
+    return {
+      headerTitle: params ? <ScreenHeader mode={params.screenEdit} /> : '',
+      headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : ''
+    }
   };
+
+  componentDidMount () {
+    this.props.navigation.setParams({ deleteButton: this._deleteButton });
+    this.props.navigation.setParams({
+      screenEdit:this.state.mode,
+    })
+  }
+
+  _deleteButton = async (value) => {
+    /*const userToken = await AsyncStorage.getItem('userId');
+    const apiurl = deletekhata
+    const getKhataId = await AsyncStorage.getItem('KhataId');
+
+    const postBody = {
+      userid: userToken,
+      khataid: getKhataId
+    }
+    console.log ('working')*/
+    this.addKhata('delete');
+  }
 
   displayStorage = async () => {
     AsyncStorage.getAllKeys((err, keys) => {
@@ -56,28 +103,37 @@ export default class AddKhata extends React.Component {
   }
 
   addKhata = async (values) => {
+    console.log (values)
 
     let self = this;
-
+    let apiurl
+    let apimethod
     const userToken = await AsyncStorage.getItem('userId');
     const mode = this.props.navigation.getParam('mode','default')
-    const apiurl = mode === 'edit' ? editkhata : addkhata
-    const apimethod = mode === 'edit' ? 'PUT' : 'POST'
+    apiurl = mode === 'edit' ? editkhata : addkhata
+    apimethod = mode === 'edit' ? 'PUT' : 'POST'
     const getKhataId = await AsyncStorage.getItem('KhataId');
-
-    const postBody = {
+    if (values === 'delete') { apiurl = deletekhata, apimethod = 'POST'}
+    const addBody = {
       userid:userToken,
       name: values.name,
       businessname: this.state.khataTypeID === "2" ? values.business : '',
       type:this.state.khataTypeID,
       khataid:mode === 'edit' ? getKhataId : ''
     }
-    console.log (postBody)
+    const deleteBody = {
+      userid:userToken,
+      khataid:getKhataId
+    }
+    const body = values === 'delete' ?  deleteBody : addBody
+
+    
+    //console.log (postBody)
     this.setState({
       loading: true,
     });
-    //console.log (userToken,mode,apiurl,apimethod )
-    api(postBody, baseurl + apiurl, apimethod, null).then(async (response)=>{
+    console.log (userToken,apiurl,body )
+    api(body, baseurl + apiurl, apimethod, null).then(async (response)=>{
       if (response.data.success === 1) {
         console.log(response);
         await AsyncStorage.setItem('khataName', response.data.name);
