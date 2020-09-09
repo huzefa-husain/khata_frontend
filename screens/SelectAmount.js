@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View, AsyncStorage } from 'react-native'
 import FormButton from '../components/FormButton'
 
-export default class Home extends React.Component {
+export default class SelectAmount extends React.Component {
   static navigationOptions = {
     title: 'Home Screen',
     headerLeft: null,
@@ -14,12 +14,23 @@ export default class Home extends React.Component {
     await AsyncStorage.removeItem('userId')
     this.props.navigation.navigate('Auth');
   };
-  addKhata = async (type) => {
+  addAmount = async (type) => {
+    const userToken = await AsyncStorage.getItem('userId');
+    const getKhataId = await AsyncStorage.getItem('KhataId');
+    const body = {
+      "userid" : userToken,
+      "khataid": getKhataId,
+      "contactid":"16",
+      "type" : "0", //for initial zero entry
+      "amount" : "0",
+      "notes":"start with zero"
+    }
     console.log (type)
-    //this.props.navigation.navigate('AddKhata');
-    this.props.navigation.navigate('AddKhata', {  
+    console.log (body)
+    
+    /*this.props.navigation.navigate('AddKhata', {  
       typeid: type 
-    })  
+    })*/  
   };
   displayStorage = async () => {
     AsyncStorage.getAllKeys((err, keys) => {
@@ -38,17 +49,17 @@ export default class Home extends React.Component {
         <View style={styles.buttonContainer}>
           <FormButton
             buttonType='outline'
-            title='Business'
+            title='Add Amount'
             buttonColor='#F57C00'
-            onPress ={() => this.addKhata('2')}
+            onPress ={() => this.addAmount('add')}
             buttonStyle = {styles.button}
             style={styles.button}
           />
           <FormButton
             buttonType='outline'
-            title='Personal'
+            title='Start With Zero'
             buttonColor='#F57C00'
-            onPress ={() => this.addKhata('1')}
+            onPress ={() => this.addAmount('zero')}
             buttonStyle = {styles.button}
             style={styles.button}
           />

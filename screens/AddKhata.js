@@ -32,10 +32,8 @@ const ScreenHeader = props => {
   //console.log ('header',props.mode)
   return (
     <View>
-    <Text>
-      <h4>{props.mode === 'edit' ? 'Edit Khata' : 'Add New Khata'}</h4>
-    </Text>
-  </View>
+      {props.mode === 'edit' ? <Text>Edit Khata</Text> : <Text>Add New Khata</Text>}
+    </View>
   )
 }
 
@@ -66,8 +64,9 @@ export default class AddKhata extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <ScreenHeader mode={params.screenEdit} /> : '',
-      headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : ''
+      headerTitle: params ? <ScreenHeader mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerBackTitleVisible: false,
     }
   };
 
@@ -134,7 +133,7 @@ export default class AddKhata extends React.Component {
     });
     console.log (userToken,apiurl,body )
     api(body, baseurl + apiurl, apimethod, null).then(async (response)=>{
-      if (response.data.success === 1) {
+      if (response.data.success === 1 && response.data.dashboard !== 0) {
         console.log(response);
         await AsyncStorage.setItem('khataName', response.data.name);
         await AsyncStorage.setItem('businessName', response.data.businessname);
@@ -147,6 +146,9 @@ export default class AddKhata extends React.Component {
         this.setState({
           loading:false
         });
+      }
+      else if (response.data.dashboard === 0) {
+        this.props.navigation.navigate('Home');
       }
       else {
         alert (response.data.message)
@@ -217,7 +219,7 @@ export default class AddKhata extends React.Component {
                 />
                 <ErrorMessage errorValue={touched.business && errors.business} />
               </React.Fragment>
-              : ''
+              : <React.Fragment></React.Fragment>
               }
               <View style={styles.buttonContainer}>
                 <FormButton

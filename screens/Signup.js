@@ -4,6 +4,7 @@ import { StyleSheet, SafeAreaView, View, AsyncStorage } from 'react-native'
 import { Button } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import Loader from '../components/Loader'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
@@ -23,12 +24,19 @@ const validationSchema = Yup.object().shape({
 })
 
 export default class Signup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading:false
+    }
+  }
   goToLogin = () => this.props.navigation.navigate('Login')
 
-  handleSubmit = async values => {  
+  handleSubmit = async (values,actions) => {  
     let self = this;
     console.log (values)
     if (values.name.length > 0 && values.phone.length > 0 && values.password.length > 0) {
+      this.setState({ loading: true });
       axios.post(baseurl + signup, {
         name: values.name,
         phone: values.phone,
@@ -36,11 +44,13 @@ export default class Signup extends React.Component {
       })
       .then(async function (response) {
         console.log(response);
+        self.setState({ loading:false });
         if (response.data.success === 1) {
           await AsyncStorage.setItem('userId', response.data.id);
           await AsyncStorage.setItem('dashboard', response.data.dashboard);
           self.props.navigation.navigate('App')
         } else {
+          actions.setSubmitting(false);
           alert (response.data.message)
         }
       })
@@ -62,18 +72,21 @@ export default class Signup extends React.Component {
   }
 
   render() {
-    this.displayStorage();
+    const { loading } = this.state
+    //this.displayStorage();
     return (
+      <React.Fragment>
       <SafeAreaView style={styles.container}>
         <Formik
+          validateOnChange
           initialValues={{
             name: '',
             phone: '',
-            password: '',
-            confirmPassword: ''
+            password: ''
           }}
-          onSubmit={values => {
-            this.handleSubmit(values)
+          onSubmit={(values,actions) => {
+            console.log (actions)
+            this.handleSubmit(values,actions)
           }}
           validationSchema={validationSchema}>
           {({
@@ -84,7 +97,8 @@ export default class Signup extends React.Component {
             isValid,
             touched,
             handleBlur,
-            isSubmitting
+            isSubmitting,
+            dirty
           }) => (
             <Fragment>
               <FormInput
@@ -106,6 +120,8 @@ export default class Signup extends React.Component {
                 iconName='ios-phone-portrait'
                 iconColor='#2C384A'
                 onBlur={handleBlur('phone')}
+                keyboardType={'number-pad'}
+                returnKeyType={'next'}
                 //autoFocus
               />
               <ErrorMessage errorValue={touched.phone && errors.phone} />
@@ -127,7 +143,7 @@ export default class Signup extends React.Component {
                   title='SIGNUP'
                   buttonColor='#F57C00'
                   disabled={!isValid || isSubmitting}
-                  loading={isSubmitting}
+                  //loading={isSubmitting}
                 />
               </View>
             </Fragment>
@@ -142,6 +158,8 @@ export default class Signup extends React.Component {
           type='clear'
         />
       </SafeAreaView>
+      {loading && <Loader />}
+      </React.Fragment>
     )
   }
 }
