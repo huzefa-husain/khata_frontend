@@ -226,7 +226,7 @@ class Dashboard extends React.Component {
       <React.Fragment>
         <View style={styles.container}> 
         
-          <ContactList data={khataContact}/>
+          <ContactList data={khataContact} navigation={this.props.navigation}/>
           
           <FormButton
             buttonType='outline'

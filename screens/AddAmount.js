@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, SafeAreaView, View, Text, AsyncStorage, ScrollView } from 'react-native'
-import { Picker, Icon, Left } from "native-base";
+import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
@@ -8,38 +7,15 @@ import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
-import { baseurl, addkhata, addcontact } from '../common/Constant'
-
-const countrycode = [
-  {
-    'value': '+965',
-    'label': 'Kuwait'
-  },
-  {
-    'value': '+91',
-    'label': 'India'
-  },
-  {
-    'value': '+880',
-    'label': 'Bangladesh'
-  },
-  {
-    'value': '+20',
-    'label': 'Egypt'
-  }
-]
+import { baseurl, addkhata, addamount } from '../common/Constant'
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .label('Name')
+  notes: Yup.string()
+    .label('notes')
     .required()
-    .min(2, 'Must have at least 2 characters'),
-  address: Yup.string()
-    .label('address')
-    .required()
-    .min(2, 'Must have at least 2 characters'),
-  phone: Yup.number().test('len', 'Must be exactly 8 characters',
-    val => val && val.toString().length === 8),
+    .min(1, 'Must have at least 1 characters'),
+  amount: Yup.number().test('len', 'Must be exactly 1 characters',
+    val => val && val.toString().length === 1),
 })
 
 const ScreenHeader = props => {
@@ -57,8 +33,7 @@ export default class AddAmount extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
-      selected: "+965"
+      loading: false
     }
   }
 
@@ -79,28 +54,29 @@ export default class AddAmount extends Component {
     });
   }
 
-  addContact = async (values) => {
+  addAmount = async (values) => {
     console.log(values)
     let self = this;
     const userToken = await AsyncStorage.getItem('userId');
-    const apiurl = addcontact
+    const apiurl = addamount
     const apimethod = 'POST'
     const getKhataId = await AsyncStorage.getItem('KhataId');
+    const getContactId = this.props.navigation.getParam('id','default')
     const addBody = {
       userid: userToken,
       khataid: getKhataId,
-      contactid: 18,
-      type: 0,
-      amount: 0,
-      "notes":"start with zero"
+      contactid: getContactId,
+      type: 1,
+      amount: values.amount,
+      notes:values.notes
     }
 
-    //console.log (postBody)
+    console.log (addBody)
     this.setState({
-      //loading: true,
+      loading: true,
     });
     console.log(addBody)
-    /*api(addBody, baseurl + apiurl, apimethod, null).then(async (response) => {
+    api(addBody, baseurl + apiurl, apimethod, null).then(async (response) => {
       if (response.data.success === 1) {
         console.log(response);
         self.props.navigation.navigate('Dashboard', {
@@ -115,13 +91,13 @@ export default class AddAmount extends Component {
       }
     }).catch(function (error) {
       console.log(error);
-    });*/
+    });
   }
 
   handleSubmit = async values => {
     let self = this;
-    if (values.name.length > 0 && values.phone.length > 0) {
-      self.addContact(values);
+    if (values.notes.length > 0 && values.amount.length > 0) {
+      self.addAmount(values);
     }
   }
 
@@ -132,7 +108,7 @@ export default class AddAmount extends Component {
   }
 
   render() {
-    const { khataTypeID, khataname, businessname, mode, loading } = this.state
+    const { loading } = this.state
     //this.displayStorage();
     //console.log ('khatatype',khatatype)
     //console.log ('khataTypeID',khataTypeID)
@@ -141,9 +117,8 @@ export default class AddAmount extends Component {
         <SafeAreaView style={styles.container}>
           <Formik
             initialValues={{
-              name: '',
-              phone: '',
-              address: ''
+              notes: '',
+              amount: '',
             }}
             onSubmit={values => {
               this.handleSubmit(values)
@@ -161,56 +136,29 @@ export default class AddAmount extends Component {
             }) => (
                 <Fragment>
                   <FormInput
-                    name='name'
-                    value={values.name}
-                    onChangeText={handleChange('name')}
-                    placeholder='Enter Name'
-                    iconName='md-person'
-                    iconColor='#2C384A'
-                    onBlur={handleBlur('name')}
-                  //autoFocus
-                  />
-                  <ErrorMessage errorValue={touched.name && errors.name} />
-                  <View style={styles.inputContainer}>
-                    <Picker
-                      note
-                      mode="dropdown"
-                      iosHeader="Country Code"
-                      iosIcon={<Icon name="arrow-down" />}
-                      style={{ width: '100%' }}
-                      selectedValue={this.state.selected}
-                      onValueChange={this.onValueChange.bind(this)}
-                    >
-                      {countrycode.map((i, index) => (
-                        <Picker.Item key={index} label={i.value + ' ' + i.label} value={i.value} />
-                      ))}
-
-                    </Picker>
-                  </View>
-                  <FormInput
-                    name='phone'
-                    value={values.phone}
-                    onChangeText={handleChange('phone')}
-                    placeholder='Enter Mobile Number'
+                    name='amount'
+                    value={values.amount}
+                    onChangeText={handleChange('amount')}
+                    placeholder='Enter Amount'
                     iconName='ios-phone-portrait'
                     iconColor='#2C384A'
-                    onBlur={handleBlur('phone')}
+                    onBlur={handleBlur('amount')}
                     keyboardType={'number-pad'}
                     returnKeyType={'next'}
                   //autoFocus
                   />
-                  <ErrorMessage errorValue={touched.phone && errors.phone} />
+                  <ErrorMessage errorValue={touched.amount && errors.amount} />
                   <FormInput
-                    name='address'
-                    value={values.address}
-                    onChangeText={handleChange('address')}
-                    placeholder='address'
+                    name='notes'
+                    value={values.notes}
+                    onChangeText={handleChange('notes')}
+                    placeholder='Notes'
                     iconName='md-person'
                     iconColor='#2C384A'
-                    onBlur={handleBlur('address')}
+                    onBlur={handleBlur('notes')}
                   //autoFocus
                   />
-                  <ErrorMessage errorValue={touched.address && errors.address} />
+                  <ErrorMessage errorValue={touched.notes && errors.notes} />
                   <View style={styles.buttonContainer}>
                     <FormButton
                       buttonType='outline'

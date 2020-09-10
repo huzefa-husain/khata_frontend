@@ -7,3 +7,6 @@ export const dashboard = "dashboard"
 export const editkhata = "editkhata"
 export const deletekhata = "deletekhata"
 export const addcontact = "addcontact"
+export const addamount = "addamount"
+export const getuseramount = "getuseramount"
+

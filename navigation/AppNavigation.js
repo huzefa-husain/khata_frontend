@@ -5,6 +5,7 @@ import AddKhata from '../screens/AddKhata'
 import AddContact from '../screens/AddContact'
 import SelectAmount from '../screens/SelectAmount'
 import AddAmount from '../screens/AddAmount'
+import GetUserAmount from '../screens/GetUserAmount'
 
 const AppNavigation = createStackNavigator(
   {
@@ -13,7 +14,8 @@ const AppNavigation = createStackNavigator(
     AddKhata: { screen: AddKhata },
     AddContact: { screen: AddContact },
     SelectAmount: { screen: SelectAmount },
-    AddAmount: { screen: AddAmount }
+    AddAmount: { screen: AddAmount },
+    GetUserAmount: { screen: GetUserAmount }
   },
   {
     initialRouteName: 'Home'
