@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
+import { DatePicker } from 'native-base';
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
@@ -12,10 +13,8 @@ import { baseurl, addkhata, addamount } from '../common/Constant'
 const validationSchema = Yup.object().shape({
   notes: Yup.string()
     .label('notes')
-    .required()
     .min(1, 'Must have at least 1 characters'),
-  amount: Yup.number().test('len', 'Must be exactly 1 characters',
-    val => val && val.toString().length === 1),
+  amount: Yup.number().min(1, 'Must have at least 1 characters'),
 })
 
 const ScreenHeader = props => {
@@ -33,7 +32,8 @@ export default class AddAmount extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false
+      loading: false,
+      chosenDate: new Date()
     }
   }
 
@@ -108,11 +108,12 @@ export default class AddAmount extends Component {
     });
   }
 
+  setDate(newDate) {
+    this.setState({ chosenDate: newDate });
+  }
+
   render() {
     const { loading } = this.state
-    //this.displayStorage();
-    //console.log ('khatatype',khatatype)
-    //console.log ('khataTypeID',khataTypeID)
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -160,6 +161,24 @@ export default class AddAmount extends Component {
                   //autoFocus
                   />
                   <ErrorMessage errorValue={touched.notes && errors.notes} />
+                  <DatePicker
+                    defaultDate={new Date(2018, 4, 4)}
+                    minimumDate={new Date(2018, 1, 1)}
+                    maximumDate={new Date(2018, 12, 31)}
+                    locale={"en"}
+                    timeZoneOffsetInMinutes={undefined}
+                    modalTransparent={false}
+                    animationType={"fade"}
+                    androidMode={"default"}
+                    placeHolderText="Select date"
+                    textStyle={{ color: "green" }}
+                    placeHolderTextStyle={{ color: "#d3d3d3" }}
+                    onDateChange={this.setDate}
+                    disabled={false}
+                    />
+                    <Text>
+                      Date: {this.state.chosenDate.toString().substr(4, 12)}
+                    </Text>
                   <View style={styles.buttonContainer}>
                     <FormButton
                       buttonType='outline'

@@ -9,4 +9,6 @@ export const deletekhata = "deletekhata"
 export const addcontact = "addcontact"
 export const addamount = "addamount"
 export const getuseramount = "getuseramount"
+export const getcurrency = "KWD"
+
 

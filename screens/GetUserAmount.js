@@ -1,17 +1,14 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
 import { Header, Card, CardItem, Body, Right, Title, Subtitle, Left } from 'native-base';
-import { Formik } from 'formik'
-import * as Yup from 'yup'
-import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
-import ErrorMessage from '../components/ErrorMessage'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
-import { baseurl, getuseramount } from '../common/Constant'
+import { baseurl, getuseramount, getcurrency } from '../common/Constant'
 
 const ScreenHeader = props => {
-  console.log('props', props.Type)
+  const textDebit = "They'll Pay"
+  const textCredit = "They'll Recieve"
   return (
     <View style={{ width: "100%" }}>
       <Header style={styles.headerbg}>
@@ -22,8 +19,8 @@ const ScreenHeader = props => {
         <Right>
           <View style={{ flexDirection: 'column' }}>
             <Body>
-              <Text style={props.Type === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.amount}</Text>
-              <Text>{props.Type !== null ? 'They will Pay' : ''}</Text>
+              <Text style={props.Type === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.amount && props.amount + getcurrency}</Text>
+              <Text>{props.Type && props.Type === "Pay" ? props.amount && textDebit : props.amount && textCredit}</Text>
             </Body>
           </View>
         </Right>
