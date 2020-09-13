@@ -61,12 +61,13 @@ export default class AddAmount extends Component {
     const apiurl = addamount
     const apimethod = 'POST'
     const getKhataId = await AsyncStorage.getItem('KhataId');
-    const getContactId = this.props.navigation.getParam('id','default')
+    const getContactId = this.props.navigation.getParam('contactid','default')
+    const getType = this.props.navigation.getParam('type','default')
     const addBody = {
       userid: userToken,
       khataid: getKhataId,
       contactid: getContactId,
-      type: 1,
+      type: getType,
       amount: values.amount,
       notes:values.notes
     }
@@ -79,7 +80,7 @@ export default class AddAmount extends Component {
     api(addBody, baseurl + apiurl, apimethod, null).then(async (response) => {
       if (response.data.success === 1) {
         console.log(response);
-        self.props.navigation.navigate('Dashboard', {
+        self.props.navigation.navigate('GetUserAmount', {
           //mode: 'edit',
         })
         this.setState({

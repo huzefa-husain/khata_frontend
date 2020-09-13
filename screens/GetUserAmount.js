@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
-import { Card, CardItem } from 'native-base';
+import { Header, Card, CardItem, Body, Right, Title, Subtitle, Left } from 'native-base';
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
@@ -10,43 +10,73 @@ import Loader from '../components/Loader'
 import { api } from '../common/Api'
 import { baseurl, getuseramount } from '../common/Constant'
 
-const validationSchema = Yup.object().shape({
-  notes: Yup.string()
-    .label('notes')
-    .required()
-    .min(1, 'Must have at least 1 characters'),
-  amount: Yup.number().test('len', 'Must be exactly 1 characters',
-    val => val && val.toString().length === 1),
-})
-
 const ScreenHeader = props => {
-  //console.log ('header',props.mode)
+  console.log('props', props.Type)
   return (
-    <View>
-      <Text>
-        User Amount
-    </Text>
+    <View style={{ width: "100%" }}>
+      <Header style={styles.headerbg}>
+        <Body>
+          <Title style={styles.title}>{props.title}</Title>
+          <Subtitle style={styles.title}>{props.phone}</Subtitle>
+        </Body>
+        <Right>
+          <View style={{ flexDirection: 'column' }}>
+            <Body>
+              <Text style={props.Type === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.amount}</Text>
+              <Text>{props.Type !== null ? 'They will Pay' : ''}</Text>
+            </Body>
+          </View>
+        </Right>
+      </Header>
     </View>
   )
 }
+
+const AmountButtons = (props) => (
+  <View style={{ flexDirection: 'row' }}>
+    <Left>
+      <FormButton
+        buttonType='outline'
+        title='You Gave'
+        buttonColor='#bd0d0d'
+        onPress={() => props.navigation.navigate('AddAmount', { type: '1', contactid:props.getContactId })}
+      //loading={isSubmitting}
+      />
+    </Left>
+    <Right>
+      <FormButton
+        buttonType='outline'
+        title='You Got'
+        buttonColor='#6bbd0d'
+        onPress={() => props.navigation.navigate('AddAmount', { type: '2', contactid:props.getContactId })}
+      //loading={isSubmitting}
+      />
+    </Right>
+  </View>
+)
 
 export default class GetUserAmount extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
-      contactAmount:null
+      contactAmount: null
     }
   }
 
   static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state;
     return {
-      headerTitle: <ScreenHeader />
+      headerTitle: params ? <ScreenHeader title={params.contactName} phone={params.contactNumber} amount={params.contactAmount} Type={params.amountType} /> : <React.Fragment></React.Fragment>
     }
   };
 
   componentDidMount() {
-    this.getAmount();
+    this.focusListner = this.props.navigation.addListener("didFocus",() => {
+      this.props.navigation.setParams({ dropButton: this._dropButton });
+      // Update your data
+      this.getAmount();
+    });
   }
 
   getAmount = async (values) => {
@@ -76,10 +106,19 @@ export default class GetUserAmount extends Component {
         })*/
         this.setState({
           loading: false,
-          contactAmount:response.data.contactamount
+          contactAmount: response.data.contactamount
         });
+        this.props.navigation.setParams({
+          contactName: response.data.contactdetails.name,
+          contactNumber: response.data.contactdetails.phone,
+          contactAmount: response.data.contactdetails.amount,
+          amountType: response.data.contactdetails.amountType
+        })
       }
       else {
+        this.setState({
+          loading: false
+        });
         alert(response.data.message)
       }
     }).catch(function (error) {
@@ -102,22 +141,30 @@ export default class GetUserAmount extends Component {
 
   render() {
     const { loading, contactAmount } = this.state
-    console.log ('amount',contactAmount)
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
-          <Text>Amount</Text>
-          <Card style={styles.cardborder}>
+          {contactAmount && contactAmount.length > 0 ? <Card style={styles.cardborder}>
             {contactAmount && contactAmount.map((items, i) => {
               return (
                 <CardItem button key={i} onPress={() => this.props.navigation.navigate('AddAmount', { id: items.id })}>
-                  <Text>{items.amount}</Text>
-                  <Text>{items.createddate}</Text>
-                  <Text>{items.note}</Text>
+                  <Body>
+                    <Right>
+                      <Text style={styles.amount}>{items.amount}</Text>
+                      <Text>{items.createddate}</Text>
+                      <Text>{items.note}</Text>
+                    </Right>
+                  </Body>
                 </CardItem>
               );
             })}
-          </Card>
+          </Card> :
+
+            <View>
+              <Text>No Records Found</Text>
+            </View>
+          }
+          <AmountButtons navigation={this.props.navigation} getContactId={this.props.navigation.getParam('id', 'default')} />
         </SafeAreaView>
         {loading && <Loader />}
       </React.Fragment>
@@ -137,7 +184,21 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginRight: 15
   },
-  cardborder:{
+  cardborder: {
     borderWidth: 0
+  },
+  amountDebit: {
+    fontSize: 30,
+    color: 'red'
+  },
+  amountCredit: {
+    fontSize: 30,
+    color: 'green'
+  },
+  title: {
+    color: 'black'
+  },
+  headerbg: {
+    backgroundColor: '#fff'
   }
 })

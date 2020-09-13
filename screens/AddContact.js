@@ -109,7 +109,7 @@ export default class AddContact extends Component {
     api(addBody, baseurl + apiurl, apimethod, null).then(async (response) => {
       if (response.data.success === 1) {
         console.log(response);
-        self.props.navigation.navigate('Dashboard', {
+        self.props.navigation.navigate('GetUserAmount', {
           //mode: 'edit',
         })
         this.setState({
