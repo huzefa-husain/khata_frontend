@@ -9,26 +9,9 @@ import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
-import { baseurl, addkhata, addcontact } from '../common/Constant'
+import { baseurl, editcontact, addcontact, deletecontact, countrycode } from '../common/Constant'
 
-const countrycode = [
-  {
-    'value': '+965',
-    'label': 'Kuwait'
-  },
-  {
-    'value': '+91',
-    'label': 'India'
-  },
-  {
-    'value': '+880',
-    'label': 'Bangladesh'
-  },
-  {
-    'value': '+20',
-    'label': 'Egypt'
-  }
-]
+
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -47,9 +30,16 @@ const ScreenHeader = props => {
   //console.log ('header',props.mode)
   return (
     <View>
-      <Text>
-        Add New Contact
-    </Text>
+      {props.mode === 'edit' ? <Text>Edit Contact</Text> : <Text>Add New Contact</Text>}
+    </View>
+  )
+}
+
+const Delete = props => {
+  return (
+    <View>
+      
+      {<Icon type="FontAwesome" name="trash" onPress={() => {props.action()}} style={{fontSize: 24, color: 'red', marginRight:10}}/>}
     </View>
   )
 }
@@ -58,21 +48,35 @@ export default class AddContact extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      khataTypeID: this.props.navigation.getParam('typeid', 'default'),
-      khataname: this.props.navigation.getParam('khataname', 'default'),
-      businessname: this.props.navigation.getParam('businessname', 'default'),
       mode: this.props.navigation.getParam('mode', 'default'),
+      name: this.props.navigation.getParam('name', 'default'),
+      phone: this.props.navigation.getParam('phone', 'default'),
+      contactid: this.props.navigation.getParam('contactid', 'default'),
       loading: false,
-      code: 'js',
+      countrycode: this.props.navigation.getParam('countrycode', 'default'),
       selected: "+965"
     }
   }
 
   static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state;
     return {
-      headerTitle: <ScreenHeader />
+      headerTitle: params ? <ScreenHeader mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerBackTitleVisible: false,
     }
   };
+
+  componentDidMount () {
+    this.props.navigation.setParams({ deleteButton: this._deleteButton });
+    this.props.navigation.setParams({
+      screenEdit:this.state.mode,
+    })
+  }
+
+  _deleteButton = () => {
+    this.addContact('delete');
+  }
 
   displayStorage = async () => {
     AsyncStorage.getAllKeys((err, keys) => {
@@ -88,10 +92,17 @@ export default class AddContact extends Component {
   addContact = async (values) => {
     console.log(values)
     let self = this;
+    let apiurl
+    let apimethod
+
     const userToken = await AsyncStorage.getItem('userId');
-    const apiurl = addcontact
-    const apimethod = 'POST'
+    //const apiurl = addcontact
+    //const apimethod = 'POST'
+    const mode = this.state.mode
+    apiurl = mode === 'edit' ? editcontact : addcontact
+    apimethod = mode === 'edit' ? 'PUT' : 'POST'
     const getKhataId = await AsyncStorage.getItem('KhataId');
+    if (values === 'delete') { apiurl = deletecontact, apimethod = 'POST'}
     const addBody = {
       userid: userToken,
       name: values.name,
@@ -101,17 +112,20 @@ export default class AddContact extends Component {
       khataid: getKhataId
     }
 
+    const deleteBody = {
+      userid:userToken,
+      khataid:getKhataId,
+      contactid:this.state.contactid
+    }
+    const body = values === 'delete' ?  deleteBody : addBody
+
     //console.log (postBody)
-    this.setState({
-      loading: true,
-    });
+    this.setState({loading: true});
     console.log(addBody)
-    api(addBody, baseurl + apiurl, apimethod, null).then(async (response) => {
+    api(body, baseurl + apiurl, apimethod, null).then(async (response) => {
       if (response.data.success === 1) {
         console.log(response);
-        self.props.navigation.navigate('GetUserAmount', {
-          //mode: 'edit',
-        })
+        self.props.navigation.navigate('Dashboard')
         this.setState({
           loading: false
         });
@@ -138,7 +152,7 @@ export default class AddContact extends Component {
   }
 
   render() {
-    const { khataTypeID, khataname, businessname, mode, loading } = this.state
+    const { mode, name, phone, loading } = this.state
     //this.displayStorage();
     //console.log ('khatatype',khatatype)
     //console.log ('khataTypeID',khataTypeID)
@@ -147,9 +161,9 @@ export default class AddContact extends Component {
         <SafeAreaView style={styles.container}>
           <Formik
             initialValues={{
-              name: '',
+              name: mode === 'edit' ? name : '',
               code: this.state.selected,
-              phone: '',
+              phone: mode === 'edit' ? phone : '',
               address: ''
             }}
             onSubmit={values => {

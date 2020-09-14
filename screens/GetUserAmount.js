@@ -7,13 +7,25 @@ import { api } from '../common/Api'
 import { baseurl, getuseramount, getcurrency } from '../common/Constant'
 
 const ScreenHeader = props => {
+  const navigation = props.nav;
   const textDebit = "They'll Pay"
   const textCredit = "They'll Recieve"
+  const editscreen = () => {
+    return (
+      navigation('AddContact', { 
+        name: props.title, 
+        phone:'999999999', 
+        contactid:props.contactid,
+        countrycode:'+91',
+        mode:'edit'
+      })
+    )
+  }
   return (
     <View style={{ width: "100%" }}>
       <Header style={styles.headerbg}>
         <Body>
-          <Title style={styles.title}>{props.title}</Title>
+          <Title onPress={editscreen} style={styles.title}>{props.title}</Title>
           <Subtitle style={styles.title}>{props.phone}</Subtitle>
         </Body>
         <Right>
@@ -64,7 +76,7 @@ export default class GetUserAmount extends Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <ScreenHeader title={params.contactName} phone={params.contactNumber} amount={params.contactAmount} Type={params.amountType} /> : <React.Fragment></React.Fragment>
+      headerTitle: params ? <ScreenHeader title={params.contactName} phone={params.contactNumber} amount={params.contactAmount} Type={params.amountType} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>
     }
   };
 
@@ -109,7 +121,9 @@ export default class GetUserAmount extends Component {
           contactName: response.data.contactdetails.name,
           contactNumber: response.data.contactdetails.phone,
           contactAmount: response.data.contactdetails.amount,
-          amountType: response.data.contactdetails.amountType
+          amountType: response.data.contactdetails.amountType,
+          contactid:getContactId,
+          screenNav:this.props.navigation.navigate
         })
       }
       else {
