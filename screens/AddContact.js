@@ -33,8 +33,9 @@ export default class AddContact extends Component {
       name: this.props.navigation.getParam('name', 'default'),
       phone: this.props.navigation.getParam('phone', 'default'),
       contactid: this.props.navigation.getParam('contactid', 'default'),
+      address:this.props.navigation.getParam('address', 'default'),
       loading: false,
-      countrycode: this.props.navigation.getParam('countrycode', 'default'),
+      //countrycode: this.props.navigation.getParam('countrycode', 'default'),
       selected: "+965"
     }
   }
@@ -53,6 +54,11 @@ export default class AddContact extends Component {
     this.props.navigation.setParams({
       screenEdit:this.state.mode,
     })
+    if (this.state.mode === 'edit') {
+      this.setState({
+        selected: this.props.navigation.getParam('countrycode', 'default')
+      });
+    }
   }
 
   _deleteButton = () => {
@@ -79,7 +85,8 @@ export default class AddContact extends Component {
       ccode: this.state.selected,
       phone: values.phone,
       address: values.address,
-      khataid: getKhataId
+      khataid: getKhataId,
+      contactid:this.state.contactid
     }
 
     const deleteBody = {
@@ -122,7 +129,7 @@ export default class AddContact extends Component {
   }
 
   render() {
-    const { mode, name, phone, loading } = this.state
+    const { mode, name, phone, address, loading } = this.state
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -131,7 +138,7 @@ export default class AddContact extends Component {
               name: mode === 'edit' ? name : '',
               code: this.state.selected,
               phone: mode === 'edit' ? phone : '',
-              address: ''
+              address: mode === 'edit' ? address : ''
             }}
             onSubmit={values => {
               this.handleSubmit(values)

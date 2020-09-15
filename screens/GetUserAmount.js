@@ -13,10 +13,11 @@ const ScreenHeader = props => {
   const editscreen = () => {
     return (
       navigation('AddContact', { 
-        name: props.title, 
-        phone:'999999999', 
+        name: props.details.name, 
+        phone:props.details.phone, 
         contactid:props.contactid,
-        countrycode:'+91',
+        countrycode:props.details.countrycode,
+        address:'hawally',
         mode:'edit'
       })
     )
@@ -25,15 +26,21 @@ const ScreenHeader = props => {
     <View style={{ width: "100%" }}>
       <Header style={styles.headerbg}>
         <Body>
-          <Title onPress={editscreen} style={styles.title}>{props.title}</Title>
-          <Subtitle style={styles.title}>{props.phone}</Subtitle>
+          <Title onPress={editscreen} style={styles.title}>{props.details.name}</Title>
+          <Subtitle onPress={editscreen} style={styles.title}>{props.details.countrycode + props.details.phone}</Subtitle>
         </Body>
         <Right>
           <View style={{ flexDirection: 'column' }}>
-            <Body>
-              <Text style={props.Type === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.amount && props.amount + getcurrency}</Text>
-              <Text>{props.Type && props.Type === "Pay" ? props.amount && textDebit : props.amount && textCredit}</Text>
-            </Body>
+            {props.details &&
+              <Body>
+                <Text style={props.details.amountType === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.details.amount !== null ? props.details.amount + getcurrency : ''}</Text>
+                  {props.details.amountType !== null ? <React.Fragment>
+                    <Text>
+                      {props.details.amountType === "Pay" ? textDebit : textCredit}
+                    </Text>
+                  </React.Fragment> : <React.Fragment></React.Fragment>}
+              </Body>
+            }
           </View>
         </Right>
       </Header>
@@ -76,7 +83,7 @@ export default class GetUserAmount extends Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <ScreenHeader title={params.contactName} phone={params.contactNumber} amount={params.contactAmount} Type={params.amountType} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>
+      headerTitle: params && params.contactDetails ? <ScreenHeader details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>
     }
   };
 
@@ -118,6 +125,7 @@ export default class GetUserAmount extends Component {
           contactAmount: response.data.contactamount
         });
         this.props.navigation.setParams({
+          contactDetails:response.data.contactdetails,
           contactName: response.data.contactdetails.name,
           contactNumber: response.data.contactdetails.phone,
           contactAmount: response.data.contactdetails.amount,

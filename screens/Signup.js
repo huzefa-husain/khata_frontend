@@ -85,7 +85,6 @@ export default class Signup extends React.Component {
             password: ''
           }}
           onSubmit={(values,actions) => {
-            console.log (actions)
             this.handleSubmit(values,actions)
           }}
           validationSchema={validationSchema}>
@@ -108,7 +107,7 @@ export default class Signup extends React.Component {
                 placeholder='Enter your name'
                 iconName='md-person'
                 iconColor='#2C384A'
-                onBlur={handleBlur('name')}
+                onBlur={handleChange('name')}
                 //autoFocus
               />
               <ErrorMessage errorValue={touched.name && errors.name} />
@@ -119,7 +118,7 @@ export default class Signup extends React.Component {
                 placeholder='Enter your phone'
                 iconName='ios-phone-portrait'
                 iconColor='#2C384A'
-                onBlur={handleBlur('phone')}
+                onBlur={handleChange('phone')}
                 keyboardType={'number-pad'}
                 returnKeyType={'next'}
                 //autoFocus
