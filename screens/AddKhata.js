@@ -1,11 +1,12 @@
 import React, { Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
-import { Icon } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
+import ScreenHeader from '../components/ScreenHeader'
+import Delete from '../components/Delete'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
 import { baseurl, addkhata, editkhata, deletekhata } from '../common/Constant'
@@ -28,26 +29,6 @@ const validationSchemaPersonal = Yup.object().shape({
     .min(2, 'Must have at least 2 characters'),
 })
 
-const ScreenHeader = props => {
-  //console.log ('header',props.mode)
-  return (
-    <View>
-      {props.mode === 'edit' ? <Text>Edit Khata</Text> : <Text>Add New Khata</Text>}
-    </View>
-  )
-}
-
-const Delete = props => {
-  console.log ('delete',props.mode)
-  return (
-    <View>
-      {<Icon name={'trash'} type={'entypo'} size={20} color='#000'
-      onPress={() => {props.action()}}
-      />}
-    </View>
-  )
-}
-
 export default class AddKhata extends React.Component {
 
   constructor(props) {
@@ -64,7 +45,7 @@ export default class AddKhata extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <ScreenHeader mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerTitle: params ? <ScreenHeader mode={params.screenEdit} title={'Khata'} /> : <React.Fragment></React.Fragment>,
       headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
       headerBackTitleVisible: false,
     }
@@ -78,15 +59,6 @@ export default class AddKhata extends React.Component {
   }
 
   _deleteButton = async (value) => {
-    /*const userToken = await AsyncStorage.getItem('userId');
-    const apiurl = deletekhata
-    const getKhataId = await AsyncStorage.getItem('KhataId');
-
-    const postBody = {
-      userid: userToken,
-      khataid: getKhataId
-    }
-    console.log ('working')*/
     this.addKhata('delete');
   }
 
@@ -168,7 +140,7 @@ export default class AddKhata extends React.Component {
 
   render() {
     const { khataTypeID, khataname, businessname, mode, loading } = this.state
-    this.displayStorage();
+    //this.displayStorage();
     //console.log ('khatatype',khatatype)
     //console.log ('khataTypeID',khataTypeID)
     return (

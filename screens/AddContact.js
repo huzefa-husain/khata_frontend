@@ -1,17 +1,16 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, Text, AsyncStorage, ScrollView } from 'react-native'
 import { Picker, Icon, Left } from "native-base";
-//import { Icon } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
+import ScreenHeader from '../components/ScreenHeader'
+import Delete from '../components/Delete'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
 import { baseurl, editcontact, addcontact, deletecontact, countrycode } from '../common/Constant'
-
-
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -25,24 +24,6 @@ const validationSchema = Yup.object().shape({
   phone: Yup.number().test('len', 'Must be exactly 8 characters',
     val => val && val.toString().length === 8),
 })
-
-const ScreenHeader = props => {
-  //console.log ('header',props.mode)
-  return (
-    <View>
-      {props.mode === 'edit' ? <Text>Edit Contact</Text> : <Text>Add New Contact</Text>}
-    </View>
-  )
-}
-
-const Delete = props => {
-  return (
-    <View>
-      
-      {<Icon type="FontAwesome" name="trash" onPress={() => {props.action()}} style={{fontSize: 24, color: 'red', marginRight:10}}/>}
-    </View>
-  )
-}
 
 export default class AddContact extends Component {
   constructor(props) {
@@ -61,7 +42,7 @@ export default class AddContact extends Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <ScreenHeader mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerTitle: params ? <ScreenHeader mode={params.screenEdit} title={'Contact'} /> : <React.Fragment></React.Fragment>,
       headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
       headerBackTitleVisible: false,
     }
@@ -76,17 +57,6 @@ export default class AddContact extends Component {
 
   _deleteButton = () => {
     this.addContact('delete');
-  }
-
-  displayStorage = async () => {
-    AsyncStorage.getAllKeys((err, keys) => {
-      AsyncStorage.multiGet(keys, (error, stores) => {
-        stores.map((result, i, store) => {
-          console.log({ [store[i][0]]: store[i][1] });
-          return true;
-        });
-      });
-    });
   }
 
   addContact = async (values) => {
@@ -153,9 +123,6 @@ export default class AddContact extends Component {
 
   render() {
     const { mode, name, phone, loading } = this.state
-    //this.displayStorage();
-    //console.log ('khatatype',khatatype)
-    //console.log ('khataTypeID',khataTypeID)
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>

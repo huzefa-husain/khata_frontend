@@ -6,9 +6,11 @@ import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
+import ScreenHeader from '../components/ScreenHeader'
+import Delete from '../components/Delete'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
-import { baseurl, addkhata, addamount } from '../common/Constant'
+import { baseurl, addamount, editamount, deleteamount } from '../common/Constant'
 
 const validationSchema = Yup.object().shape({
   notes: Yup.string()
@@ -17,52 +19,55 @@ const validationSchema = Yup.object().shape({
   amount: Yup.number().min(1, 'Must have at least 1 characters'),
 })
 
-const ScreenHeader = props => {
-  //console.log ('header',props.mode)
-  return (
-    <View>
-      <Text>
-        Add Amount
-    </Text>
-    </View>
-  )
-}
-
 export default class AddAmount extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
-      chosenDate: new Date()
+      chosenDate: new Date(),
+      mode:this.props.navigation.getParam('mode','default'),
+      data:this.props.navigation.getParam('items','default')
     }
   }
 
   static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state;
     return {
-      headerTitle: <ScreenHeader />
+      headerTitle: params ? <ScreenHeader mode={params.screenEdit} title={'Amount'}/> : <React.Fragment></React.Fragment>,
+      headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerBackTitleVisible: false,
     }
   };
 
-  displayStorage = async () => {
-    AsyncStorage.getAllKeys((err, keys) => {
-      AsyncStorage.multiGet(keys, (error, stores) => {
-        stores.map((result, i, store) => {
-          console.log({ [store[i][0]]: store[i][1] });
-          return true;
-        });
-      });
+  componentDidMount () {
+    this.props.navigation.setParams({ deleteButton: this._deleteButton });
+    this.focusListner = this.props.navigation.addListener("didFocus",() => {
+      this.props.navigation.setParams({
+        screenEdit:this.state.mode,
+      })
+      console.log ('items',this.state.data)
     });
   }
 
+  _deleteButton = () => {
+    this.addAmount('delete');
+  }
+
   addAmount = async (values) => {
-    console.log(values)
+    const { mode, data } = this.state
     let self = this;
+    let apiurl
+    let apimethod
     const userToken = await AsyncStorage.getItem('userId');
-    const apiurl = addamount
-    const apimethod = 'POST'
     const getKhataId = await AsyncStorage.getItem('KhataId');
     const getContactId = this.props.navigation.getParam('contactid','default')
     const getType = this.props.navigation.getParam('type','default')
+
+    apiurl = mode === 'edit' ? editamount : addamount
+    apimethod = mode === 'edit' ? 'PUT' : 'POST'
+    
+    if (values === 'delete') { apiurl = deleteamount, apimethod = 'POST'}
+
     const addBody = {
       userid: userToken,
       khataid: getKhataId,
@@ -72,20 +77,26 @@ export default class AddAmount extends Component {
       notes:values.notes
     }
 
-    console.log (addBody)
-    this.setState({
-      loading: true,
-    });
-    console.log(addBody)
-    api(addBody, baseurl + apiurl, apimethod, null).then(async (response) => {
+    const deleteBody = {
+      tranid:data.id,
+    }
+
+    const editBody = {
+      tranid : data.id,
+      type : data.type,
+      amount : values.amount,
+      notes: values.notes,
+      trndate:"2020-12-10"
+    }
+    
+    const body = values === 'delete' ?  deleteBody : mode === 'edit' ? editBody : addBody
+
+    this.setState({ loading: true });
+    api(body, baseurl + apiurl, apimethod, null).then(async (response) => {
       if (response.data.success === 1) {
         console.log(response);
-        self.props.navigation.navigate('GetUserAmount', {
-          //mode: 'edit',
-        })
-        this.setState({
-          loading: false
-        });
+        self.props.navigation.navigate('GetUserAmount')
+        this.setState({ loading: false });
       }
       else {
         alert(response.data.message)
@@ -113,14 +124,14 @@ export default class AddAmount extends Component {
   }
 
   render() {
-    const { loading } = this.state
+    const { mode, data, loading } = this.state
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
           <Formik
             initialValues={{
-              notes: '',
-              amount: '',
+              notes: mode === 'edit' ? data.note : '',
+              amount: mode === 'edit' ? data.amount : '',
             }}
             onSubmit={values => {
               this.handleSubmit(values)

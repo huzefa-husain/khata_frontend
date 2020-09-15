@@ -12,7 +12,10 @@ export const addcontact = "addcontact"
 export const editcontact = "editcontact"
 export const deletecontact = "deletecontact"
 export const addamount = "addamount"
+export const editamount = "editamount"
+export const deleteamount = "deleteamount"
 export const getuseramount = "getuseramount"
+
 
 //Other Const
 

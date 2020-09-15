@@ -158,7 +158,10 @@ export default class GetUserAmount extends Component {
           {contactAmount && contactAmount.length > 0 ? <Card style={styles.cardborder}>
             {contactAmount && contactAmount.map((items, i) => {
               return (
-                <CardItem button key={i} onPress={() => this.props.navigation.navigate('AddAmount', { id: items.id })}>
+                <CardItem button key={i} onPress={() => this.props.navigation.navigate('AddAmount', { 
+                  items:items,
+                  mode:'edit'
+                })}>
                   <Body>
                     <Right>
                       <Text style={styles.amount}>{items.amount}</Text>
