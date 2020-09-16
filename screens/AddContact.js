@@ -122,12 +122,6 @@ export default class AddContact extends Component {
     }
   }
 
-  onValueChange(value) {
-    this.setState({
-      selected: value
-    });
-  }
-
   render() {
     const { mode, name, phone, address, loading } = this.state
     return (
@@ -152,7 +146,8 @@ export default class AddContact extends Component {
               isValid,
               touched,
               handleBlur,
-              isSubmitting
+              isSubmitting,
+              setFieldValue
             }) => (
                 <Fragment>
                   <FormInput
@@ -174,7 +169,10 @@ export default class AddContact extends Component {
                       iosIcon={<Icon name="arrow-down" />}
                       style={{ width: '100%' }}
                       selectedValue={this.state.selected}
-                      onValueChange={this.onValueChange.bind(this)}
+                      onValueChange={(itemValue) => {
+                        setFieldValue('code', itemValue)
+                        this.setState({selected: itemValue})
+                      }} 
                     >
                       {countrycode.map((i, index) => (
                         <Picker.Item key={index} label={i.value + ' ' + i.label} value={i.value} />
