@@ -17,7 +17,7 @@ const ScreenHeader = props => {
         phone:props.details.phone, 
         contactid:props.contactid,
         countrycode:props.details.countrycode,
-        address:'hawally',
+        address:props.details.address,
         mode:'edit'
       })
     )

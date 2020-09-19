@@ -1,13 +1,13 @@
 import React from 'react'
 import { StyleSheet, Text, View, AsyncStorage, TouchableHighlight } from 'react-native'
-import { Card, Icon } from 'react-native-elements'
+import { Icon } from 'react-native-elements'
 import FormButton from '../components/FormButton'
 import Loader from '../components/Loader'
 import ContactList from '../components/ContactList'
+import DebouncedInput from '../components/DebouncedInput';
 import { api } from '../common/Api'
-import { baseurl, dashboard } from '../common/Constant'
+import { baseurl, dashboard, getsearch } from '../common/Constant'
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
-//import { withNavigation } from 'react-navigation';
 
 const HeaderTitle = props => {
   //console.log ('header',props)
@@ -18,8 +18,6 @@ const HeaderTitle = props => {
   </React.Fragment> 
   );
 }
-
-
 
 const Edit = (props) => {
   const navigation = props.nav;
@@ -80,6 +78,7 @@ const DropDown = props => {
 }
 
 class Dashboard extends React.Component {
+  debounceTimer = null;
   constructor(props) {
     super(props);
     this.state = {
@@ -213,21 +212,33 @@ class Dashboard extends React.Component {
     });
   };
 
+  getSuggestions = async (searchTerm) => {
+    const userToken = await AsyncStorage.getItem('userId');
+    console.log(searchTerm)
+    api(null, baseurl + getsearch + searchTerm + '&' + 'user=' + userToken, 'GET', null).then((response)=>{
+      console.log(response);
+      this.setState({
+        khataContact:response.data.contactlist,
+      });
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+
   signOutAsync = async () => {
     await AsyncStorage.removeItem('userId')
     this.props.navigation.navigate('Auth');
   };
 
   render() {
-    const { khataData, khataName, loading, khataContact } = this.state
+    const { loading, khataContact } = this.state
     //this.displayStorage();
     //console.log (khataContact)
     return (
       <React.Fragment>
         <View style={styles.container}> 
-        
+          <DebouncedInput debounceTime={1000} callback={this.getSuggestions} />
           <ContactList data={khataContact} navigation={this.props.navigation}/>
-          
           <FormButton
             buttonType='outline'
             title='Add Contact'
@@ -235,8 +246,6 @@ class Dashboard extends React.Component {
             onPress={() => {
               this.props.navigation.navigate('AddContact')
             }}
-            //buttonStyle = {styles.button}
-            //style={styles.button}
           />
           <FormButton
             buttonType='outline'

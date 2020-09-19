@@ -15,7 +15,7 @@ export const addamount = "addamount"
 export const editamount = "editamount"
 export const deleteamount = "deleteamount"
 export const getuseramount = "getuseramount"
-
+export const getsearch = "search?search="
 
 //Other Const
 
