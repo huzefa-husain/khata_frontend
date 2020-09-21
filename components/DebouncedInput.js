@@ -1,7 +1,7 @@
 import React from 'react'
 import { Input } from 'react-native-elements'
 import { StyleSheet, View } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from 'native-base';
 
 const DebouncedInput = ({
   iconName,
@@ -19,7 +19,7 @@ const DebouncedInput = ({
   <View style={styles.inputContainer}>
     <Input
       {...rest}
-      leftIcon={<Ionicons name={iconName} size={28} color={iconColor} />}
+      leftIcon={<Icon type="FontAwesome" name="search" color={iconColor}/>}
       leftIconContainerStyle={styles.iconStyle}
       placeholderTextColor='grey'
       name={name}

@@ -237,7 +237,8 @@ class Dashboard extends React.Component {
     return (
       <React.Fragment>
         <View style={styles.container}> 
-          <DebouncedInput debounceTime={1000} callback={this.getSuggestions} />
+          <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search Contacts'
+          iconName='search' iconColor='#2C384A'/>
           <ContactList data={khataContact} navigation={this.props.navigation}/>
           <FormButton
             buttonType='outline'
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
     //backgroundColor: '#fff',
     //alignItems: 'center',
     //justifyContent: 'center',
-    marginTop:40
+    marginTop:10
   },
 })
 

@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
 import { DatePicker } from 'native-base';
+import moment from "moment";
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import FormInput from '../components/FormInput'
@@ -24,7 +25,7 @@ export default class AddAmount extends Component {
     super(props);
     this.state = {
       loading: false,
-      chosenDate: new Date(),
+      chosenDate: moment(new Date()).format("YYYY-MM-DD"),
       mode:this.props.navigation.getParam('mode','default'),
       data:this.props.navigation.getParam('items','default')
     }
@@ -74,7 +75,8 @@ export default class AddAmount extends Component {
       contactid: getContactId,
       type: getType,
       amount: values.amount,
-      notes:values.notes
+      notes:values.notes,
+      trndate:this.state.chosenDate
     }
 
     const deleteBody = {
@@ -86,7 +88,7 @@ export default class AddAmount extends Component {
       type : data.type,
       amount : values.amount,
       notes: values.notes,
-      trndate:"2020-12-10"
+      trndate:this.state.chosenDate
     }
     
     const body = values === 'delete' ?  deleteBody : mode === 'edit' ? editBody : addBody
@@ -124,7 +126,7 @@ export default class AddAmount extends Component {
   }
 
   render() {
-    const { mode, data, loading } = this.state
+    const { mode, data, loading, chosenDate } = this.state
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -186,9 +188,10 @@ export default class AddAmount extends Component {
                     placeHolderTextStyle={{ color: "#d3d3d3" }}
                     onDateChange={this.setDate}
                     disabled={false}
+                    formatChosenDate={date => {return moment(date).format('YYYY-MM-DD');}}
                     />
                     <Text>
-                      Date: {this.state.chosenDate.toString().substr(4, 12)}
+                      Date: {chosenDate}
                     </Text>
                   <View style={styles.buttonContainer}>
                     <FormButton
