@@ -1,15 +1,32 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
+import { StyleSheet, SafeAreaView, View, Text, AsyncStorage, StatusBar } from 'react-native'
 import { Header, Card, CardItem, Body, Right, Title, Subtitle, Left } from 'native-base';
 import FormButton from '../components/FormButton'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
 import { baseurl, getuseramount, getcurrency } from '../common/Constant'
 
-const ScreenHeader = props => {
-  const navigation = props.nav;
+const ScreenRight = props => {
   const textDebit = "They'll Pay"
   const textCredit = "They'll Recieve"
+  return (
+    <View>
+      {props.details &&
+        <View>
+          <Text style={props.details.amountType === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.details.amount !== null ? props.details.amount + getcurrency : ''}</Text>
+          {props.details.amountType !== null ? <React.Fragment>
+            <Text>
+              {props.details.amountType === "Pay" ? textDebit : textCredit}
+            </Text>
+          </React.Fragment> : <React.Fragment></React.Fragment>}
+        </View>
+      }
+    </View>
+  )
+}
+
+const ScreenLeft = props => {
+  const navigation = props.nav;
   const editscreen = () => {
     return (
       navigation('AddContact', { 
@@ -22,32 +39,28 @@ const ScreenHeader = props => {
       })
     )
   }
+
+  const back = () => {
+    return (
+      navigation('Dashboard')
+    )
+  }
+  
   return (
-    <View style={{ width: "100%" }}>
-      <Header style={styles.headerbg}>
-        <Body>
-          <Title onPress={editscreen} style={styles.title}>{props.details.name}</Title>
-          <Subtitle onPress={editscreen} style={styles.title}>{props.details.countrycode + props.details.phone}</Subtitle>
-        </Body>
-        <Right>
-          <View style={{ flexDirection: 'column' }}>
-            {props.details &&
-              <Body>
-                <Text style={props.details.amountType === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.details.amount !== null ? props.details.amount + getcurrency : ''}</Text>
-                  {props.details.amountType !== null ? <React.Fragment>
-                    <Text>
-                      {props.details.amountType === "Pay" ? textDebit : textCredit}
-                    </Text>
-                  </React.Fragment> : <React.Fragment></React.Fragment>}
-              </Body>
-            }
-          </View>
-        </Right>
-      </Header>
+    <View style={{flex: 1, flexDirection: 'row',justifyContent: 'space-between'}}>
+        <View style={{flex: 1, alignItems: 'flex-start'}}>
+          <Text onPress={back}>Back</Text>
+        </View>
+        <View>
+        <Title onPress={editscreen} style={styles.title}>
+              {props.details.name}
+        </Title>
+        <Subtitle onPress={editscreen} style={styles.title}>{props.details.countrycode + props.details.phone}</Subtitle> 
+        </View>
     </View>
+
   )
 }
-
 const AmountButtons = (props) => (
   <View style={{ flexDirection: 'row' }}>
     <Left>
@@ -83,7 +96,9 @@ export default class GetUserAmount extends Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params && params.contactDetails ? <ScreenHeader details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>
+      headerLeft: params && params.contactDetails ? <ScreenLeft details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>,
+
+      headerRight: params && params.contactDetails ? <ScreenRight details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>,
     }
   };
 
@@ -170,13 +185,11 @@ export default class GetUserAmount extends Component {
                   items:items,
                   mode:'edit'
                 })}>
-                  <Body>
-                    <Right>
+                    <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center',alignItems: 'flex-end'}}>
                       <Text style={styles.amount}>{items.amount}</Text>
                       <Text>{items.createddate}</Text>
                       <Text>{items.note}</Text>
-                    </Right>
-                  </Body>
+                    </View>
                 </CardItem>
               );
             })}
@@ -210,11 +223,11 @@ const styles = StyleSheet.create({
     borderWidth: 0
   },
   amountDebit: {
-    fontSize: 30,
+    fontSize: 20,
     color: 'red'
   },
   amountCredit: {
-    fontSize: 30,
+    fontSize: 20,
     color: 'green'
   },
   title: {
