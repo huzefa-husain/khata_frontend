@@ -1,6 +1,9 @@
 import React, { Fragment } from 'react'
 import axios from 'axios'
-import { StyleSheet, SafeAreaView, View, AsyncStorage } from 'react-native'
+import { StyleSheet, SafeAreaView, View, AsyncStorage, Text } from 'react-native'
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import { Header, Body, Title } from 'native-base';
+import { styles, buttons } from '../common/styles'
 import { Button } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -23,11 +26,23 @@ const validationSchema = Yup.object().shape({
     .min(8, 'Password must have more than 8 characters ')
 })
 
+const HeaderTitle = props => {
+  //console.log ('header',props)
+  return (
+    <Header style={{backgroundColor:'#fff'}}>
+    <Body>
+      <Title style={{color:'#687DFC'}}>Khata Book</Title>
+    </Body>
+  </Header>
+  );
+}
+
 export default class Signup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading:false
+      loading:false,
+      showPassword:false
     }
   }
   goToLogin = () => this.props.navigation.navigate('Login')
@@ -72,11 +87,12 @@ export default class Signup extends React.Component {
   }
 
   render() {
-    const { loading } = this.state
+    const { loading,showPassword } = this.state
     //this.displayStorage();
     return (
       <React.Fragment>
       <SafeAreaView style={styles.container}>
+        <HeaderTitle />
         <Formik
           validateOnChange
           initialValues={{
@@ -100,22 +116,31 @@ export default class Signup extends React.Component {
             dirty
           }) => (
             <Fragment>
+              <View style={{marginLeft:25,fontSize:16, marginTop:25}}>
+                <Text style={{fontWeight:'bold',paddingBottom:5}}>Welcome,</Text>
+                <Text style={{paddingBottom:5}}>Sign up and enjoy</Text>
+                <Text>our app.</Text>
+              </View>
+              <View style={styles.boxcontainer}>
+              <View style={styles.inputDivider}>  
               <FormInput
                 name='name'
                 value={values.name}
                 onChangeText={handleChange('name')}
-                placeholder='Enter your name'
+                placeholder='Full Name'
                 iconName='md-person'
                 iconColor='#2C384A'
                 onBlur={handleChange('name')}
                 //autoFocus
               />
               <ErrorMessage errorValue={touched.name && errors.name} />
+              </View>
+              <View style={styles.inputDivider}>    
               <FormInput
                 name='phone'
                 value={values.phone}
                 onChangeText={handleChange('phone')}
-                placeholder='Enter your phone'
+                placeholder='Enter mobile number'
                 iconName='ios-phone-portrait'
                 iconColor='#2C384A'
                 onBlur={handleChange('phone')}
@@ -124,23 +149,35 @@ export default class Signup extends React.Component {
                 //autoFocus
               />
               <ErrorMessage errorValue={touched.phone && errors.phone} />
+              </View>
+              <View style={{paddingTop:15,position:'relative'}}>
               <FormInput
                 name='password'
                 value={values.password}
                 onChangeText={handleChange('password')}
-                placeholder='Enter password'
+                placeholder='Password'
                 secureTextEntry
                 iconName='ios-lock'
                 iconColor='#2C384A'
                 onBlur={handleBlur('password')}
               />
+              <Icon
+              name={showPassword ? 'eye-slash' : 'eye'}
+              size={15}
+              color="grey"
+              onPress={() => this.setState({showPassword: !showPassword})}
+              style={{position:'absolute', top:25, right:10}}
+            />
               <ErrorMessage errorValue={touched.password && errors.password} />
+              </View>
+              </View>
               <View style={styles.buttonContainer}>
                 <FormButton
                   buttonType='outline'
                   onPress={handleSubmit}
-                  title='SIGNUP'
-                  buttonColor='#F57C00'
+                  title='Next'
+                  textColor= '#ffffff'
+                  buttonColor='#687DFC'
                   disabled={!isValid || isSubmitting}
                   //loading={isSubmitting}
                 />
@@ -148,27 +185,31 @@ export default class Signup extends React.Component {
             </Fragment>
           )}
         </Formik>
+        <View style={{fontSize:16, alignItems:'center'}}>
+          <Text style={{fontWeight:'bold',paddingBottom:5}}>By creating an account you agree to our</Text>
+          <Text style={{paddingBottom:5}}>Terms &amp; Conditions and Privacy Policy</Text>
+        </View>
+        <View style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',}}>
+          <View>
+            <Text style={{fontSize:18}}>Have an account?</Text>
+          </View>
+        <View>
         <Button
-          title='Have an account? Login'
+          title='Login'
           onPress={this.goToLogin}
           titleStyle={{
-            color: '#039BE5'
+            color: '#687DFC'
           }}
           type='clear'
         />
+        </View>
+        </View>
       </SafeAreaView>
       {loading && <Loader />}
       </React.Fragment>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  buttonContainer: {
-    margin: 25
-  }
-})

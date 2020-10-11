@@ -33,6 +33,7 @@ export default class Home extends React.Component {
   }
   render() {
     //this.displayStorage();
+    console.log (this.props.navigation.state.routeName)
     return (
       <View>
         <View style={styles.buttonContainer}>
@@ -75,6 +76,18 @@ export default class Home extends React.Component {
     )
   }
 }
+
+/*const Root = createBottomTabNavigator({
+  Dashboard: {
+      screen: Dashboard,
+  },
+  Chat: {
+      screen: AddKhata
+  },
+})
+
+export default Root*/
+
 
 const styles = StyleSheet.create({
   container: {

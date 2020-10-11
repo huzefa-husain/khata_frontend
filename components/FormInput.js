@@ -15,24 +15,28 @@ const FormInput = ({
   <View style={styles.inputContainer}>
     <Input
       {...rest}
-      leftIcon={<Ionicons name={iconName} size={28} color={iconColor} />}
+      //leftIcon={<Ionicons name={iconName} size={28} color={iconColor} style={{padding:0}} />}
       leftIconContainerStyle={styles.iconStyle}
       placeholderTextColor='grey'
       name={name}
       placeholder={placeholder}
       keyboardType={keyboardType}
       returnKeyType={returnKeyType}
-      style={styles.input}
+      underlineColorAndroid ='transparent'
+      inputContainerStyle={{borderBottomWidth:0}}
     />
   </View>
 )
 
 const styles = StyleSheet.create({
   inputContainer: {
-    margin: 15
+    //marginLeft:-10,
+    //marginRight:-10,
+    padding:0,
+    borderWidth: 0
   },
   iconStyle: {
-    marginRight: 10
+    //marginRight: 10
   }
 })
 
