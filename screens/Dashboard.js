@@ -6,6 +6,7 @@ import FormButton from '../components/FormButton'
 import Loader from '../components/Loader'
 import ContactList from '../components/ContactList'
 import DebouncedInput from '../components/DebouncedInput';
+import Totals from '../components/TotalsDashboard';
 import { api } from '../common/Api'
 import { baseurl, dashboard, getsearch } from '../common/Constant'
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
@@ -37,7 +38,6 @@ const Edit = (props) => {
               type={'entypo'}
               size={20}
               color='#000'
-              
         />
         </TouchableOpacity>
     </View>
@@ -235,12 +235,16 @@ class Dashboard extends React.Component {
 
   render() {
     const { loading, khataContact, totalAmount } = this.state
+    console.log (totalAmount)
     //this.displayStorage();
     return (
       <React.Fragment>
         <View style={styles.container}>
-          <View style={{backgroundColor:'#687DFC'}}>
+          <View style={{backgroundColor:'#687DFC', paddingBottom:10}}>
+          <View>
             <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search' Font={'12'}/>
+          </View>
+            <Totals totalAmount={totalAmount}/>
           </View>
           <View style={{paddingLeft:20, paddingRight:20}}>
             <ContactList data={khataContact} navigation={this.props.navigation} contactCount={totalAmount && totalAmount.contactcount} />

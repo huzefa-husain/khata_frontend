@@ -15,7 +15,7 @@ class ContactList extends React.Component {
     return (
       <React.Fragment>
         <View style={{paddingTop:15}}>
-        <Text style={{color:'#ACACAC'}}>{this.props.contactCount} Customers</Text>
+        <Text style={{color:'#ACACAC'}}>{this.props.contactCount && this.props.contactCount + ' Customers'}</Text>
         <View style={{paddingTop:15}}>
         {this.props.data && this.props.data.map((items, i) => {
             //console.log ('contact', this.props.data)
@@ -29,7 +29,7 @@ class ContactList extends React.Component {
                   </View>
                   <View>
                       <Text style={items.amountType === "Pay" ? styles.amountDebit : styles.amountCredit}>
-                        {items.amountType === "Pay" || items.amountType === "Receive" ? items.amount + getcurrency : ''}
+                        {items.amountType === "Pay" || items.amountType === "Receive" ? items.amount + ' ' + getcurrency : ''}
                       </Text>
                       <Text style={styles.offText}>
                         {items.amountType === "Pay" ? textDebit : items.amount === null ? <React.Fragment></React.Fragment> : textCredit}
@@ -61,12 +61,14 @@ const styles = StyleSheet.create({
   amountDebit: {
     fontSize: 15,
     color: '#BD3642',
-    fontWeight:'bold'
+    fontWeight:'bold',
+    textAlign:'right'
   },
   amountCredit: {
     fontSize: 15,
-    color: 'green',
-    fontWeight:'bold'
+    color: '#008648',
+    fontWeight:'bold',
+    textAlign:'right'
   },
   offText: {
     color:'#ACACAC',
