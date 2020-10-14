@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import { StyleSheet, SafeAreaView, View, AsyncStorage, Text } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Header, Body, Title } from 'native-base';
-import { styles, buttons } from '../common/styles'
+import { styles } from '../common/styles'
 import { Button } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -38,7 +38,7 @@ export default class Login extends React.Component {
     super(props);
     this.state = {
       loading:false,
-      showPassword:false
+      showPassword:true
     }
   }
 
@@ -54,7 +54,7 @@ export default class Login extends React.Component {
         password: values.password
       }
       api(postBody, baseurl + login, 'POST', null).then(async (response)=>{
-        console.log(response);
+        //alert(response);
         this.setState({ loading: true });
         if (response.data.success === 1) {
           console.log(response.data.id);
@@ -95,10 +95,10 @@ export default class Login extends React.Component {
             isSubmitting
           }) => (
             <React.Fragment>
-            <View style={{marginLeft:25,fontSize:16, marginTop:25}}>
-            <Text style={{fontWeight:'bold',paddingBottom:5}}>Welcome back,</Text>
-            <Text style={{paddingBottom:5}}>please login</Text>
-            <Text>to your account</Text>
+            <View style={{marginLeft:25, marginTop:25}}>
+            <Text style={{fontWeight:'bold',paddingBottom:5,fontSize:28}}>Welcome back,</Text>
+            <Text style={{paddingBottom:5,fontSize:28 }}>please login</Text>
+            <Text style={{fontSize:28 }}>to your account</Text>
             </View>  
             <View style={styles.boxcontainer}>
               <View style={styles.inputDivider}>
@@ -153,14 +153,15 @@ export default class Login extends React.Component {
         justifyContent: 'center',
         alignItems: 'center',}}>
           <View>
-            <Text style={{fontSize:18}}>Don't have an account?</Text>
+            <Text style={{fontSize:16}}>Don't have an account?</Text>
           </View>
         <View>
         <Button
           title="Sign up now"
           onPress={this.goToSignup}
           titleStyle={{
-            color: '#687DFC'
+            color: '#687DFC',
+            fontSize:16
           }}
           type='clear'
         />

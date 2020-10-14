@@ -15,7 +15,7 @@ export default class Home extends React.Component {
     this.props.navigation.navigate('Auth');
   };
   addKhata = async (type) => {
-    console.log (type)
+    //console.log (type)
     //this.props.navigation.navigate('AddKhata');
     this.props.navigation.navigate('AddKhata', {  
       typeid: type 

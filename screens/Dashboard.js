@@ -1,5 +1,6 @@
 import React from 'react'
-import { StyleSheet, Text, View, AsyncStorage, TouchableHighlight } from 'react-native'
+import { StyleSheet, Text, View, AsyncStorage } from 'react-native'
+import { styles } from '../common/styles'
 import { Icon } from 'react-native-elements'
 import FormButton from '../components/FormButton'
 import Loader from '../components/Loader'
@@ -10,12 +11,11 @@ import { baseurl, dashboard, getsearch } from '../common/Constant'
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 
 const HeaderTitle = props => {
-  //console.log ('header',props)
   return (
-  <React.Fragment> 
+    <React.Fragment> 
     <Text>{props.title}</Text>
     {props.businessName && props.businessName !== "" ? <Text> | {props.businessName}</Text> : <Text></Text>}
-  </React.Fragment> 
+    </React.Fragment>
   );
 }
 
@@ -61,7 +61,9 @@ const DropDown = props => {
               props.khatadata && props.khatadata.map((list, i) => {
                 return (
                   <MenuOption key={i} value={list.name}>
-                    <Text onPress={() => props.action(list.name,list.id,list.businessname,list.type)}>{list.name}</Text>
+                    <Text onPress={() => 
+                      props.action(list.name,list.id,list.businessname,list.type)
+                      }>{list.name}</Text>
                   </MenuOption>
                 );
               })
@@ -148,8 +150,6 @@ class Dashboard extends React.Component {
         const getBusinessName = response[2][0][1]
         const getTypeId = response[3][0][1]
 
-        //console.log ('set',response)
-
         this.props.navigation.setParams({
             screenTitle: getKhataName,
             businessName: getBusinessName,
@@ -178,7 +178,7 @@ class Dashboard extends React.Component {
     });
     
     api(postBody, baseurl + dashboard, 'POST', null).then(async (response)=>{
-      console.log(response);
+      //console.log(response);
       if (response.data.dashboard !== 0) {
         this.setState({
           khataData: response.data.khatalist,
@@ -190,11 +190,9 @@ class Dashboard extends React.Component {
           value !== undefined || khataid !== undefined || businessname !== undefined || typeID !== undefined ||
           value !== null || khataid !== null || businessname !== null || typeID !== null
           ) {
-          
           this.setParam(value, khataid, businessname, typeID, this.state.khataData);
           
         } else {
-
           const value = response.data.khatalist[0].name
           const businessname = response.data.khatalist[0].businessname
           const typeID = response.data.khatalist[0].type
@@ -214,7 +212,7 @@ class Dashboard extends React.Component {
 
   getSuggestions = async (searchTerm) => {
     const userToken = await AsyncStorage.getItem('userId');
-    console.log(searchTerm)
+    //console.log(searchTerm)
     api(null, baseurl + getsearch + searchTerm + '&' + 'user=' + userToken, 'GET', null).then((response)=>{
       console.log(response);
       this.setState({
@@ -225,35 +223,27 @@ class Dashboard extends React.Component {
     });
   }
 
-  signOutAsync = async () => {
-    await AsyncStorage.removeItem('userId')
-    this.props.navigation.navigate('Auth');
-  };
-
   render() {
     const { loading, khataContact } = this.state
     //this.displayStorage();
-    //console.log (khataContact)
     return (
       <React.Fragment>
-        <View style={styles.container}> 
-          <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search Contacts'
-          iconName='search' iconColor='#2C384A'/>
+        <View style={styles.container}>
+          <View style={{backgroundColor:'#687DFC'}}>
+            <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search Contacts' iconName='search' iconColor='#2C384A'/>
+          </View>
           <ContactList data={khataContact} navigation={this.props.navigation}/>
+          <View style={{ paddingLeft:20, paddingRight:20}}>
           <FormButton
             buttonType='outline'
-            title='Add Contact'
-            buttonColor='#F57C00'
+            title='+ Add Customer'
+            buttonColor='#687DFC'
+            textColor='#ffffff'
             onPress={() => {
               this.props.navigation.navigate('AddContact')
             }}
           />
-          <FormButton
-            buttonType='outline'
-            title='Sign Out'
-            buttonColor='#F57C00'
-            onPress={this.signOutAsync}
-          />
+          </View>
           
         </View>
         {loading && <Loader />}
@@ -261,15 +251,5 @@ class Dashboard extends React.Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    //flex: 1,
-    //backgroundColor: '#fff',
-    //alignItems: 'center',
-    //justifyContent: 'center',
-    marginTop:10
-  },
-})
 
 export default Dashboard;

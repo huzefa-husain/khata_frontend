@@ -116,10 +116,10 @@ export default class Signup extends React.Component {
             dirty
           }) => (
             <Fragment>
-              <View style={{marginLeft:25,fontSize:16, marginTop:25}}>
-                <Text style={{fontWeight:'bold',paddingBottom:5}}>Welcome,</Text>
-                <Text style={{paddingBottom:5}}>Sign up and enjoy</Text>
-                <Text>our app.</Text>
+              <View style={{marginLeft:25, marginTop:25}}>
+                <Text style={{fontWeight:'bold',paddingBottom:5, fontSize:28}}>Welcome,</Text>
+                <Text style={{paddingBottom:5, fontSize:28}}>Sign up and enjoy</Text>
+                <Text style={{fontSize:28}}>our app.</Text>
               </View>
               <View style={styles.boxcontainer}>
               <View style={styles.inputDivider}>  
@@ -194,14 +194,15 @@ export default class Signup extends React.Component {
         justifyContent: 'center',
         alignItems: 'center',}}>
           <View>
-            <Text style={{fontSize:18}}>Have an account?</Text>
+            <Text style={{fontSize:16}}>Have an account?</Text>
           </View>
         <View>
         <Button
           title='Login'
           onPress={this.goToLogin}
           titleStyle={{
-            color: '#687DFC'
+            color: '#687DFC',
+            fontSize:16
           }}
           type='clear'
         />
