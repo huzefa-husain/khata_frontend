@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, AsyncStorage } from 'react-native'
+import { StyleSheet, Text, View, AsyncStorage, TouchableOpacity } from 'react-native'
 import { styles } from '../common/styles'
 import { Icon } from 'react-native-elements'
 import FormButton from '../components/FormButton'
@@ -24,19 +24,22 @@ const Edit = (props) => {
   //console.log (props.type)
   return (
     <View>
-        <Icon name={'edit'}
-              type={'entypo'}
-              size={20}
-              color='#000'
-              onPress={() => {
+        <TouchableOpacity style={{flexDirection:"row"}} onPress={() => {
                 navigation('AddKhata', {  
                   mode: 'edit',
                   typeid: props.type,
                   khataname: props.khataname,
                   businessname: props.businessName
                 })
-              }}
+              }}>
+        <Text>Edit</Text>
+        <Icon name={'edit'}
+              type={'entypo'}
+              size={20}
+              color='#000'
+              
         />
+        </TouchableOpacity>
     </View>
     
   )
@@ -86,6 +89,7 @@ class Dashboard extends React.Component {
     this.state = {
       khataContact:null,
       khataData:null,
+      totalAmount:null,
       loading:false
     }
   }
@@ -96,6 +100,11 @@ class Dashboard extends React.Component {
       headerTitle: params ? <HeaderTitle title={params.screenTitle} businessName={params.businessName} /> : <React.Fragment></React.Fragment> ,
       headerLeft: null,
       headerBackTitle: null,
+      headerStyle: {
+        backgroundColor: '#687DFC',
+        borderBottomWidth: 0,
+        shadowColor: 'transparent'
+      },
       headerRight: params ? <React.Fragment> 
         <Edit nav={params.screenNav} type={params.typeId} khataname={params.screenTitle} businessName={params.businessName} khataId={params.khataId} /> 
         <DropDown action={params.dropButton} khatadata={params.screenData} nav={params.screenNav} /> 
@@ -178,11 +187,12 @@ class Dashboard extends React.Component {
     });
     
     api(postBody, baseurl + dashboard, 'POST', null).then(async (response)=>{
-      //console.log(response);
+      //console.log('dashboard',response);
       if (response.data.dashboard !== 0) {
         this.setState({
           khataData: response.data.khatalist,
           khataContact:response.data.contactlist,
+          totalAmount:response.data.totalamount[0],
           loading:false
         });
 
@@ -224,16 +234,18 @@ class Dashboard extends React.Component {
   }
 
   render() {
-    const { loading, khataContact } = this.state
+    const { loading, khataContact, totalAmount } = this.state
     //this.displayStorage();
     return (
       <React.Fragment>
         <View style={styles.container}>
           <View style={{backgroundColor:'#687DFC'}}>
-            <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search Contacts' iconName='search' iconColor='#2C384A'/>
+            <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search' Font={'12'}/>
           </View>
-          <ContactList data={khataContact} navigation={this.props.navigation}/>
-          <View style={{ paddingLeft:20, paddingRight:20}}>
+          <View style={{paddingLeft:20, paddingRight:20}}>
+            <ContactList data={khataContact} navigation={this.props.navigation} contactCount={totalAmount && totalAmount.contactcount} />
+          </View>
+          <View style={{ paddingLeft:20, paddingRight:20, marginTop:30}}>
           <FormButton
             buttonType='outline'
             title='+ Add Customer'

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Input } from 'react-native-elements'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, TextInput } from 'react-native'
 import { Icon } from 'native-base';
 
 const DebouncedInput = ({
@@ -12,21 +12,22 @@ const DebouncedInput = ({
   placeholder,
   debounceTime,
   callback,
+  font,
   ...rest
 }) => {
   let debounceTimer = null
   return (
   <View style={styles.inputContainer}>
-    <Input
+    <TextInput
       {...rest}
-      leftIcon={<Icon type="FontAwesome" name="search" color={iconColor}/>}
+      //leftIcon={<Icon type="FontAwesome" name="search" color={iconColor}/>}
       leftIconContainerStyle={styles.iconStyle}
-      placeholderTextColor='grey'
+      placeholderTextColor='white'
       name={name}
       placeholder={placeholder}
       keyboardType={keyboardType}
       returnKeyType={returnKeyType}
-      style={styles.input}
+      style={{fontSize:14, borderRadius:7, backgroundColor:'#5367E3', padding:10}}
       onChange={(event) => {
         debounceTimer = setTimeout(
           callback.bind(null, event.target.value), 
@@ -43,7 +44,10 @@ const styles = StyleSheet.create({
     margin: 15
   },
   iconStyle: {
-    marginRight: 10
+    marginRight: 10,
+  },
+  input:{
+    //fontSize:12
   }
 })
 

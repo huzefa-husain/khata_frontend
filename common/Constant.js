@@ -19,5 +19,5 @@ export const getsearch = "search?search="
 
 //Other Const
 
-export const getcurrency = "KWD"
+export const getcurrency = "KD"
 export const countrycode = [{'value': '+965','label': 'Kuwait'},{'value': '+91','label': 'India'},{'value': '+880','label': 'Bangladesh'},{'value': '+20','label': 'Egypt'}]

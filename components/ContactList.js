@@ -1,11 +1,11 @@
 //import React from 'react';
 import React, { useEffect } from 'react';
 import {StyleSheet, Text, StatusBar} from 'react-native';
-import { List, ListItem, Left, Right, View, Body } from 'native-base';
+import { List, ListItem, Left, Right, View, Body, Card, CardItem } from 'native-base';
 import { getcurrency } from '../common/Constant'
 
-const textDebit = "They'll Pay"
-const textCredit = "They'll Recieve"
+const textDebit = "You'll Get"
+const textCredit = "You'll Give"
 
 class ContactList extends React.Component {
   constructor(props) {
@@ -14,28 +14,34 @@ class ContactList extends React.Component {
   render() {
     return (
       <React.Fragment>
-      <Text>Contacts</Text>
-      <List>
+        <View style={{paddingTop:15}}>
+        <Text style={{color:'#ACACAC'}}>{this.props.contactCount} Customers</Text>
+        <View style={{paddingTop:15}}>
         {this.props.data && this.props.data.map((items, i) => {
+            //console.log ('contact', this.props.data)
             return (
-              <ListItem key={i} onPress={() => this.props.navigation.navigate('GetUserAmount', { id: items.id })}>
-                <View style={{flex: 1, flexDirection: 'row',justifyContent: 'space-between',}}>
-                  <View style={{height: 50, justifyContent: 'center'}} >
-                    <Text>{items.name}</Text>
+              <Card key={i} onPress={() => this.props.navigation.navigate('GetUserAmount', { id: items.id })} style={{paddingBottom:5, paddingTop:5, borderRadius:5}}>
+              <CardItem>
+                <View style={{flex: 1, flexDirection: 'row',justifyContent: 'space-between'}}>
+                  <View style={{justifyContent: 'center', fontWeight:'bold'}} >
+                    <Text style={{fontWeight:'bold'}}>{items.name}</Text>
+                    <Text style={styles.offText}>{items.transectionscince}</Text>
                   </View>
-                  <View style={{height: 50}} >
+                  <View>
                       <Text style={items.amountType === "Pay" ? styles.amountDebit : styles.amountCredit}>
                         {items.amountType === "Pay" || items.amountType === "Receive" ? items.amount + getcurrency : ''}
                       </Text>
-                      <Text>
+                      <Text style={styles.offText}>
                         {items.amountType === "Pay" ? textDebit : items.amount === null ? <React.Fragment></React.Fragment> : textCredit}
                       </Text>
                   </View>
                 </View>
-              </ListItem>
+              </CardItem>
+              </Card>
             );
         })}
-      </List>
+        </View>
+        </View>
       </React.Fragment>  
     )
   }
@@ -53,15 +59,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   amountDebit: {
-    fontSize: 30,
-    color: 'red'
+    fontSize: 15,
+    color: '#BD3642',
+    fontWeight:'bold'
   },
   amountCredit: {
-    fontSize: 30,
-    color: 'green'
+    fontSize: 15,
+    color: 'green',
+    fontWeight:'bold'
   },
-  title: {
-    fontSize: 32,
+  offText: {
+    color:'#ACACAC',
+    fontSize:12,
+    paddingTop:3
   },
 });
 
