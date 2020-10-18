@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView, View, Text, AsyncStorage, ScrollView } from '
 import { Picker, Icon, Left } from "native-base";
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import { styles } from '../common/styles'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
@@ -44,7 +45,7 @@ export default class AddContact extends Component {
     const { params } = navigation.state;
     return {
       headerTitle: params ? <ScreenHeader mode={params.screenEdit} title={'Contact'} /> : <React.Fragment></React.Fragment>,
-      headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerRight: params && params.screenEdit === 'edit' ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
       headerBackTitleVisible: false,
     }
   };
@@ -150,6 +151,8 @@ export default class AddContact extends Component {
               setFieldValue
             }) => (
                 <Fragment>
+                  <View style={styles.boxcontainer}>
+                  <View style={styles.inputDivider}>
                   <FormInput
                     name='name'
                     value={values.name}
@@ -161,7 +164,9 @@ export default class AddContact extends Component {
                   //autoFocus
                   />
                   <ErrorMessage errorValue={touched.name && errors.name} />
-                  <View style={styles.inputContainer}>
+                  </View>
+                  <View style={styles.inputDivider}>
+                  <View>
                     <Picker
                       note
                       mode="dropdown"
@@ -180,6 +185,8 @@ export default class AddContact extends Component {
 
                     </Picker>
                   </View>
+                  </View>
+                  <View style={styles.inputDivider}>
                   <FormInput
                     name='phone'
                     value={values.phone}
@@ -193,6 +200,8 @@ export default class AddContact extends Component {
                   //autoFocus
                   />
                   <ErrorMessage errorValue={touched.phone && errors.phone} />
+                  </View>
+                  <View style={{paddingTop:15,position:'relative'}}>
                   <FormInput
                     name='address'
                     value={values.address}
@@ -204,15 +213,21 @@ export default class AddContact extends Component {
                   //autoFocus
                   />
                   <ErrorMessage errorValue={touched.address && errors.address} />
+                  </View>
+                  </View>
                   <View style={styles.buttonContainer}>
-                    <FormButton
-                      buttonType='outline'
-                      onPress={handleSubmit}
-                      title='Save'
-                      buttonColor='#F57C00'
-                      disabled={!isValid || isSubmitting}
+                  <FormButton
+                    buttonType='outline'
+                    onPress={handleSubmit}
+                    title='Save'
+                    textColor= '#ffffff'
+                    buttonColor='#687DFC'
+                    icon={true}
+                    iconType='FontAwesome'
+                    iconName='arrow-right'
+                    disabled={!isValid || isSubmitting}
                     //loading={isSubmitting}
-                    />
+                  />
                   </View>
                 </Fragment>
               )}
@@ -225,7 +240,7 @@ export default class AddContact extends Component {
   }
 }
 
-const styles = StyleSheet.create({
+/*const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff'
@@ -237,4 +252,4 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginRight: 15
   }
-})
+})*/

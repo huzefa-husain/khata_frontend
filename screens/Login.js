@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
-import { StyleSheet, SafeAreaView, View, AsyncStorage, Text } from 'react-native'
+import { SafeAreaView, View, AsyncStorage, Text } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { Header, Body, Title } from 'native-base';
 import { styles } from '../common/styles'
 import { Button } from 'react-native-elements'
 import { Formik } from 'formik'
@@ -10,6 +9,7 @@ import Loader from '../components/Loader'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
+import CommonHeader from '../components/CommonHeader'
 import { api } from '../common/Api'
 import { baseurl, login } from '../common/Constant'
 
@@ -21,17 +21,6 @@ const validationSchema = Yup.object().shape({
     .required()
     .min(8, 'Password must have more than 8 characters '),
 })
-
-const HeaderTitle = props => {
-  //console.log ('header',props)
-  return (
-    <Header style={{backgroundColor:'#fff'}}>
-    <Body>
-      <Title style={{color:'#687DFC'}}>Khata Book</Title>
-    </Body>
-  </Header>
-  );
-}
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -77,7 +66,7 @@ export default class Login extends React.Component {
     const { loading,showPassword } = this.state
     return (
       <SafeAreaView style={styles.container}>
-        <HeaderTitle />
+        <CommonHeader />
         <Formik
           initialValues={{ phone:'', password: '' }}
           onSubmit={values => {

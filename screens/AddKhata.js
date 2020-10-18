@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react'
-import { StyleSheet, SafeAreaView, View, Text, AsyncStorage } from 'react-native'
+import { SafeAreaView, View, Text, AsyncStorage } from 'react-native'
+import { Icon } from 'native-base';
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import { styles } from '../common/styles'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
@@ -46,8 +48,9 @@ export default class AddKhata extends React.Component {
     const { params } = navigation.state;
     return {
       headerTitle: params ? <ScreenHeader mode={params.screenEdit} title={'Khata'} /> : <React.Fragment></React.Fragment>,
-      headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
+      headerRight: params && params.screenEdit === 'edit' ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
       headerBackTitleVisible: false,
+      headerBackTitle: null,
     }
   };
 
@@ -166,42 +169,63 @@ export default class AddKhata extends React.Component {
             isSubmitting
           }) => (
             <Fragment>
-              <FormInput
-                name='name'
-                value={values.name}
-                onChangeText={handleChange('name')}
-                placeholder='Name of Khata'
-                iconName='md-person'
-                iconColor='#2C384A'
-                onBlur={handleBlur('name')}
-                //autoFocus
-              />
-              <ErrorMessage errorValue={touched.name && errors.name} />
-              {khataTypeID === "2" ? 
+              <View style={{marginLeft:25, marginTop:25}}>
+                <Text style={{fontWeight:'bold',paddingBottom:5,fontSize:28}}>Few Details first,</Text>
+                <Text style={{paddingBottom:5,fontSize:28 }}>we need your business</Text>
+                <Text style={{fontSize:28 }}>khata book name</Text>
+              </View>
+              <View style={styles.boxcontainer}>
+                <View style={khataTypeID === "2" ? styles.inputDivider : {paddingTop:15}}>
+                    <FormInput
+                    name='name'
+                    value={values.name}
+                    onChangeText={handleChange('name')}
+                    placeholder='Name of your Khata'
+                    iconName='md-person'
+                    iconColor='#2C384A'
+                    onBlur={handleBlur('name')}
+                    //autoFocus
+                    />
+                    <ErrorMessage errorValue={touched.name && errors.name} />
+                </View>
+                {khataTypeID === "2" ? 
               <React.Fragment>
+                <View style={{paddingTop:15,position:'relative'}}>
                 <FormInput
                   name='business'
                   value={values.business}
                   onChangeText={handleChange('business')}
-                  placeholder='Business Name'
+                  placeholder='Enter Business Name'
                   iconName='md-person'
                   iconColor='#2C384A'
                   onBlur={handleBlur('business')}
                   //autoFocus
                 />
                 <ErrorMessage errorValue={touched.business && errors.business} />
+                </View>
               </React.Fragment>
               : <React.Fragment></React.Fragment>
               }
+              </View>  
+              
               <View style={styles.buttonContainer}>
+                {/*<View style={{flexDirection:'row', backgroundColor:'#687DFC', justifyContent:'center', padding:20, borderRadius:5}}>
+                <Text style={{color:'#fff', paddingRight:10}}>Save</Text>
+                <Icon type="FontAwesome" name="arrow-right" style={{color:'#fff', fontSize:14}}/>
+                </View>*/}
                 <FormButton
                   buttonType='outline'
                   onPress={handleSubmit}
                   title='Save'
-                  buttonColor='#F57C00'
+                  textColor= '#ffffff'
+                  buttonColor='#687DFC'
+                  icon={true}
+                  iconType='FontAwesome'
+                  iconName='arrow-right'
                   disabled={!isValid || isSubmitting}
                   //loading={isSubmitting}
                 />
+                
               </View>
             </Fragment>
           )}
@@ -212,13 +236,3 @@ export default class AddKhata extends React.Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  buttonContainer: {
-    margin: 25
-  }
-})

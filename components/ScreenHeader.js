@@ -4,7 +4,7 @@ import { View, Text } from 'react-native';
 const ScreenHeader = ({ mode, title}) => (
   <View>
       {mode && <React.Fragment>
-      {mode === 'edit' ? <Text>Edit {title}</Text> : <Text>Add {title}</Text>}
+      {mode === 'edit' ? <Text style={{fontWeight:'bold'}}>Edit {title}</Text> : <Text style={{fontWeight:'bold'}}>Add a new {title}</Text>}
       </React.Fragment>}
   </View>
 )

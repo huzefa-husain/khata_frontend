@@ -66,7 +66,9 @@ const HomeStack = createStackNavigator({
   Home: {
     screen: Home,
     navigationOptions: {
-      headerTitle: 'Home',
+      header:null,
+      headerBackTitle: null,
+      headerTitle: null,
     },
   },
   AddKhata: { screen: AddKhata },

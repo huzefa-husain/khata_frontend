@@ -1,7 +1,8 @@
 import React from 'react'
 import { StyleSheet, Text, View, AsyncStorage, TouchableOpacity } from 'react-native'
 import { styles } from '../common/styles'
-import { Icon } from 'react-native-elements'
+import { Icon } from 'native-base';
+//import { Icon } from 'react-native-elements'
 import FormButton from '../components/FormButton'
 import Loader from '../components/Loader'
 import ContactList from '../components/ContactList'
@@ -9,13 +10,16 @@ import DebouncedInput from '../components/DebouncedInput';
 import Totals from '../components/TotalsDashboard';
 import { api } from '../common/Api'
 import { baseurl, dashboard, getsearch } from '../common/Constant'
+import { Picker } from "native-base";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 
 const HeaderTitle = props => {
   return (
-    <React.Fragment> 
-    <Text>{props.title}</Text>
-    {props.businessName && props.businessName !== "" ? <Text> | {props.businessName}</Text> : <Text></Text>}
+    <React.Fragment>
+      <View style={{paddingLeft:16, paddingTop:10}}>   
+        <Text style={{fontSize:16, color:'#fff'}}>{props.title}</Text>
+        {props.businessName && props.businessName !== "" ? <Text style={{fontSize:16, color:'#fff'}}> | {props.businessName}</Text> : <Text></Text>}
+      </View>
     </React.Fragment>
   );
 }
@@ -24,7 +28,7 @@ const Edit = (props) => {
   const navigation = props.nav;
   //console.log (props.type)
   return (
-    <View>
+    <View style={{paddingRight:16, paddingTop:10}}>
         <TouchableOpacity style={{flexDirection:"row"}} onPress={() => {
                 navigation('AddKhata', {  
                   mode: 'edit',
@@ -33,12 +37,8 @@ const Edit = (props) => {
                   businessname: props.businessName
                 })
               }}>
-        <Text>Edit</Text>
-        <Icon name={'edit'}
-              type={'entypo'}
-              size={20}
-              color='#000'
-        />
+        <Text style={{color:'#fff', paddingRight:10}}>Edit</Text>
+        <Icon type="FontAwesome" name="edit" style={{color:'#fff', fontSize:18}}/>
         </TouchableOpacity>
     </View>
     
@@ -48,16 +48,18 @@ const Edit = (props) => {
 const DropDown = props => {
   //console.log (props.action)
   const navigation = props.nav;
+  let initvalue = 'key1'
   return (
     <React.Fragment>
-        <Menu /*onSelect={(value)  => props.action(value)}*/>
+        {<Menu>
           <MenuTrigger>
-          <Icon
+          <Icon type="FontAwesome" name="caret-down" style={{color:'#fff', fontSize:18, paddingLeft:10}}/>  
+          {/*<Icon
             name={'dots-three-vertical'}
             type={'entypo'}
             size={20}
             color='#000'
-            />
+          />*/}
           </MenuTrigger>
           <MenuOptions optionsContainerStyle={{ marginTop: 40 }} >
             {
@@ -77,7 +79,7 @@ const DropDown = props => {
               />
             </MenuOption>
           </MenuOptions>
-        </Menu>
+              </Menu>}
     </React.Fragment>
   )
 }
@@ -90,15 +92,19 @@ class Dashboard extends React.Component {
       khataContact:null,
       khataData:null,
       totalAmount:null,
-      loading:false
+      loading:false,
+      selected: "key1"
     }
   }
 
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <HeaderTitle title={params.screenTitle} businessName={params.businessName} /> : <React.Fragment></React.Fragment> ,
-      headerLeft: null,
+      headerTitle: null,
+      headerLeft: params ? <React.Fragment>
+        <HeaderTitle title={params.screenTitle} businessName={params.businessName} />
+        <DropDown action={params.dropButton} khatadata={params.screenData} nav={params.screenNav} />
+      </React.Fragment> : <React.Fragment></React.Fragment> ,
       headerBackTitle: null,
       headerStyle: {
         backgroundColor: '#687DFC',
@@ -107,7 +113,7 @@ class Dashboard extends React.Component {
       },
       headerRight: params ? <React.Fragment> 
         <Edit nav={params.screenNav} type={params.typeId} khataname={params.screenTitle} businessName={params.businessName} khataId={params.khataId} /> 
-        <DropDown action={params.dropButton} khatadata={params.screenData} nav={params.screenNav} /> 
+        
         </React.Fragment> : <React.Fragment></React.Fragment>
       }
   };
@@ -233,13 +239,35 @@ class Dashboard extends React.Component {
     });
   }
 
+  onValueChange(value) {
+    this.setState({
+      selected: value
+    });
+  }
+
   render() {
     const { loading, khataContact, totalAmount } = this.state
     console.log (totalAmount)
     //this.displayStorage();
     return (
       <React.Fragment>
+        {loading === false ? 
         <View style={styles.container}>
+        {/*<Picker
+              mode="dropdown"
+              iosHeader="Select your SIM"
+              iosIcon={<Icon name="arrow-down" />}
+              style={{ width: undefined }}
+              selectedValue={this.state.selected}
+              onValueChange={this.onValueChange.bind(this)}
+            >
+              <Picker.Item label="Wallet" value="key0" />
+              <Picker.Item label="ATM Card" value="key1" />
+              <Picker.Item label="Debit Card" value="key2" />
+              <Picker.Item label="Credit Card" value="key3" />
+              <Picker.Item label="Net Banking" value="key4" />
+            </Picker>*/
+          }
           <View style={{backgroundColor:'#687DFC', paddingBottom:10}}>
           <View>
             <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search' Font={'12'}/>
@@ -261,8 +289,8 @@ class Dashboard extends React.Component {
           />
           </View>
           
-        </View>
-        {loading && <Loader />}
+        </View> : <Loader />
+        }
       </React.Fragment>
     )
   }

@@ -1,19 +1,11 @@
 import React from 'react'
-import { StyleSheet, Text, View, AsyncStorage } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity} from 'react-native'
+import { Icon } from 'native-base';
 import FormButton from '../components/FormButton'
+import CommonHeader from '../components/CommonHeader'
 
 export default class Home extends React.Component {
-  static navigationOptions = {
-    title: 'Home Screen',
-    headerLeft: null,
-    headerBackTitle: null
-  };
 
-  signOutAsync = async () => {
-    //await AsyncStorage.clear();
-    await AsyncStorage.removeItem('userId')
-    this.props.navigation.navigate('Auth');
-  };
   addKhata = async (type) => {
     //console.log (type)
     //this.props.navigation.navigate('AddKhata');
@@ -21,73 +13,57 @@ export default class Home extends React.Component {
       typeid: type 
     })  
   };
-  displayStorage = async () => {
-    AsyncStorage.getAllKeys((err, keys) => {
-      AsyncStorage.multiGet(keys, (error, stores) => {
-        stores.map((result, i, store) => {
-          console.log({ [store[i][0]]: store[i][1] });
-          return true;
-        });
-      });
-    });
-  }
   render() {
-    //this.displayStorage();
-    console.log (this.props.navigation.state.routeName)
     return (
       <View>
+        <CommonHeader />
+        <View style={{marginLeft:25, marginTop:25, marginBottom:25}}>
+            <Text style={{fontWeight:'bold',paddingBottom:5,fontSize:28}}>Choose a type,</Text>
+            <Text style={{paddingBottom:5,fontSize:28 }}>Select your account</Text>
+            <Text style={{fontSize:28 }}>type</Text>
+        </View>  
         <View style={styles.buttonContainer}>
-          <FormButton
-            buttonType='outline'
-            title='Business'
-            buttonColor='#F57C00'
-            onPress ={() => this.addKhata('2')}
-            buttonStyle = {styles.button}
-            style={styles.button}
-          />
-          <FormButton
-            buttonType='outline'
-            title='Personal'
-            buttonColor='#F57C00'
-            onPress ={() => this.addKhata('1')}
-            buttonStyle = {styles.button}
-            style={styles.button}
-          />
-
-          <FormButton
-            buttonType='outline'
-            title='Dashboard'
-            buttonColor='#F57C00'
-            onPress ={() => this.props.navigation.navigate('Dashboard')}
-            buttonStyle = {styles.button}
-            style={styles.button}
-          />
-
-          <FormButton
-            buttonType='outline'
-            title='Sign Out'
-            buttonColor='#F57C00'
-            onPress={this.signOutAsync}
-            buttonStyle = {styles.button}
-            style={styles.button}
-          />
+          <TouchableOpacity onPress ={() => this.addKhata('2')}>
+          <View style={{borderColor:'#ccc', borderWidth:1, borderRadius:5, backgroundColor:'#fff', padding:20}}>
+            <View style={{flexDirection:'row'}}>
+              <View style={{backgroundColor:'#687DFC', padding:20, width:'25%', alignItems:'center'}}>
+                  <Icon type="FontAwesome" name="building" style={{color:'#fff', fontSize:30}}/>
+              </View>
+              <View style={{width:'60%', alignItems:'flex-start', paddingLeft:10, paddingTop:10}}>
+              <Text style={{fontSize:16, fontWeight:'bold'}}>Business</Text>
+              <Text style={{fontSize:9}}>Business book comes with some advance business specific features.</Text>
+              </View>
+              <View style={{width:'20%', alignItems:'flex-end', paddingTop:15}}>
+                <Icon type="FontAwesome" name="arrow-right" style={{color:'#687DFC', fontSize:30}}/>
+              </View>
+            </View>
+          
+          </View>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress ={() => this.addKhata('1')}>
+          <View style={{borderColor:'#ccc', borderWidth:1, borderRadius:5, backgroundColor:'#fff', padding:20}}>
+            <View style={{flexDirection:'row'}}>
+              <View style={{backgroundColor:'#687DFC', padding:20, width:'25%', alignItems:'center'}}>
+                  <Icon type="FontAwesome" name="user" style={{color:'#fff', fontSize:30}}/>
+              </View>
+              <View style={{width:'60%', alignItems:'flex-start', paddingLeft:10, paddingTop:10}}>
+              <Text style={{fontSize:16, fontWeight:'bold'}}>Personal</Text>
+              <Text style={{fontSize:9}}>Personal book to maintain transactions of your home, family and friends.</Text>
+              </View>
+              <View style={{width:'20%', alignItems:'flex-end', paddingTop:15}}>
+                <Icon type="FontAwesome" name="arrow-right" style={{color:'#687DFC', fontSize:30}}/>
+              </View>
+            </View>
+          
+          </View>
+          </TouchableOpacity>
         </View>
       </View>
     )
   }
 }
-
-/*const Root = createBottomTabNavigator({
-  Dashboard: {
-      screen: Dashboard,
-  },
-  Chat: {
-      screen: AddKhata
-  },
-})
-
-export default Root*/
-
 
 const styles = StyleSheet.create({
   container: {
@@ -97,7 +73,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   buttonContainer: {
-    marginTop: 25,
+    marginBottom: 25,
+    paddingLeft:20,
+    paddingRight:20,
     maxWidth:'100%',
     justifyContent: 'center',
   },
