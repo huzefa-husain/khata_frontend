@@ -35,7 +35,7 @@ export default class Login extends React.Component {
 
   handleSubmit = async values => {  
     let self = this;
-    console.log (values)
+    //console.log (values)
     if (values.phone.length > 0 && values.password.length > 0) {
       this.setState({ loading: true });
       const postBody = {
@@ -46,10 +46,12 @@ export default class Login extends React.Component {
         //alert(response);
         this.setState({ loading: true });
         if (response.data.success === 1) {
-          console.log(response.data.id);
+          console.log(response.data.khatalist[0]);
           await AsyncStorage.setItem('userId', response.data.id);
           await AsyncStorage.setItem('phone', response.data.phone);
           await AsyncStorage.setItem('dashboard', response.data.dashboard);
+          await AsyncStorage.setItem('KhataId', response.data.khatalist[0].id);
+          await AsyncStorage.setItem('khataName', response.data.khatalist[0].name);
           //self.props.navigation.navigate('App')
           response.data.dashboard !== "0" ? self.props.navigation.navigate('Dashboard') : self.props.navigation.navigate('App')
         }

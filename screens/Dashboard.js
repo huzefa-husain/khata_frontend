@@ -247,7 +247,7 @@ class Dashboard extends React.Component {
 
   render() {
     const { loading, khataContact, totalAmount } = this.state
-    console.log (totalAmount)
+    console.log (totalAmount && totalAmount.contactcount)
     //this.displayStorage();
     return (
       <React.Fragment>
@@ -274,10 +274,18 @@ class Dashboard extends React.Component {
           </View>
             <Totals totalAmount={totalAmount}/>
           </View>
-          <View style={{paddingLeft:20, paddingRight:20}}>
+          {totalAmount && totalAmount.contactcount === "0" ? 
+          <View style={[styles.commonSpace, {justifyContent: 'center', flex:1, alignItems:'center'}]}>
+            <Text>No Contacts for this Khata</Text>
+            <Text>Please add few</Text>
+          </View>
+           : 
+           <View style={[styles.commonSpace]}>
             <ContactList data={khataContact} navigation={this.props.navigation} contactCount={totalAmount && totalAmount.contactcount} />
           </View>
-          <View style={{ paddingLeft:20, paddingRight:20, marginTop:30}}>
+          }
+          
+          <View style={{ paddingLeft:20, paddingRight:20, marginTop:30, marginBottom:20}}>
           <FormButton
             buttonType='outline'
             title='+ Add Customer'

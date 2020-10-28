@@ -1,6 +1,6 @@
 //import React from 'react';
 import React, { useEffect } from 'react';
-import {StyleSheet, Text, StatusBar} from 'react-native';
+import {StyleSheet, Text, StatusBar, TouchableOpacity} from 'react-native';
 import { List, ListItem, Left, Right, View, Body, Card, CardItem } from 'native-base';
 import { getcurrency } from '../common/Constant'
 
@@ -20,8 +20,9 @@ class ContactList extends React.Component {
         {this.props.data && this.props.data.map((items, i) => {
             //console.log ('contact', this.props.data)
             return (
-              <Card key={i} onPress={() => this.props.navigation.navigate('GetUserAmount', { id: items.id })} style={{paddingBottom:5, paddingTop:5, borderRadius:5}}>
-              <CardItem>
+              <TouchableOpacity key={i} onPress={() => this.props.navigation.navigate('GetUserAmount', { id: items.id })}>
+              <Card  style={{paddingBottom:5, paddingTop:5, borderRadius:5}}>
+              <CardItem onPress={() => console.log ('working')} >
                 <View style={{flex: 1, flexDirection: 'row',justifyContent: 'space-between'}}>
                   <View style={{justifyContent: 'center', fontWeight:'bold'}} >
                     <Text style={{fontWeight:'bold'}}>{items.name}</Text>
@@ -38,6 +39,7 @@ class ContactList extends React.Component {
                 </View>
               </CardItem>
               </Card>
+              </TouchableOpacity>
             );
         })}
         </View>

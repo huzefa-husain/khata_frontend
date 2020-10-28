@@ -22,6 +22,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
     paddingTop:15
+  },
+  commonSpace:{
+    paddingLeft:20, paddingRight:20
   }
 })
 

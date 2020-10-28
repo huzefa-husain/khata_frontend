@@ -72,9 +72,7 @@ const HomeStack = createStackNavigator({
     },
   },
   AddKhata: { screen: AddKhata },
-  AddContact: { 
-    screen: AddContact 
-  }
+  AddContact: { screen: AddContact }
 });
 
 const DashboardStack = createStackNavigator({
@@ -82,9 +80,8 @@ const DashboardStack = createStackNavigator({
     screen: Dashboard
   },
   AddKhata: { screen: AddKhata },
-  AddContact: { 
-    screen: AddContact 
-  }
+  AddContact: { screen: AddContact },
+  GetUserAmount: { screen: GetUserAmount }
 });
 
 const AppNavigation = createBottomTabNavigator({
