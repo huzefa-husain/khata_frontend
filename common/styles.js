@@ -25,7 +25,30 @@ const styles = StyleSheet.create({
   },
   commonSpace:{
     paddingLeft:20, paddingRight:20
-  }
+  },
+  cardborder: {
+    borderWidth: 0
+  },
+  amountDebit: {
+    fontSize: 20,
+    color: 'red'
+  },
+  amountCredit: {
+    fontSize: 20,
+    color: 'green'
+  },
+  title: {
+    color: '#fff',
+    textAlign:'left',
+    fontSize:16
+  },
+  headerbg: {
+    backgroundColor: '#fff'
+  },
+  inputContainer: {
+    marginLeft: 15,
+    marginRight: 15
+  },
 })
 
 const buttons = StyleSheet.create({

@@ -1,6 +1,7 @@
-import React, { Component, Fragment } from 'react'
-import { StyleSheet, SafeAreaView, View, Text, AsyncStorage, StatusBar } from 'react-native'
-import { Header, Card, CardItem, Body, Right, Title, Subtitle, Left } from 'native-base';
+import React, { Component } from 'react'
+import { View, Text, AsyncStorage, TouchableOpacity } from 'react-native'
+import { Card, CardItem, Right, Title, Subtitle, Left, Icon } from 'native-base';
+import { styles } from '../common/styles'
 import FormButton from '../components/FormButton'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
@@ -48,14 +49,16 @@ const ScreenLeft = props => {
   
   return (
     <View style={{flex: 1, flexDirection: 'row',justifyContent: 'space-between'}}>
-        <View style={{flex: 1, alignItems: 'flex-start'}}>
-          <Text onPress={back}>Back</Text>
+        <View style={{flex: 1, alignItems: 'flex-start', marginLeft:15, marginTop:13, marginRight:10}}>
+        <TouchableOpacity onPress={back}>
+          <Icon type="FontAwesome" name="arrow-left" style={{color:'#fff', fontSize:18}}/>
+        </TouchableOpacity>
         </View>
         <View>
         <Title onPress={editscreen} style={styles.title}>
-              {props.details.name}
+            {props.details.name}
         </Title>
-        <Subtitle onPress={editscreen} style={styles.title}>{props.details.countrycode + props.details.phone}</Subtitle> 
+        <Subtitle onPress={editscreen} style={[styles.title, {fontSize:15}]}>{props.details.countrycode + props.details.phone}</Subtitle> 
         </View>
     </View>
 
@@ -64,22 +67,30 @@ const ScreenLeft = props => {
 const AmountButtons = (props) => (
   <View style={{ flexDirection: 'row' }}>
     <Left>
-      <FormButton
-        buttonType='outline'
-        title='You Gave'
-        buttonColor='#bd0d0d'
-        onPress={() => props.navigation.navigate('AddAmount', { type: '1', contactid:props.getContactId })}
-      //loading={isSubmitting}
-      />
+      <View style={{width:'95%'}}>
+        <FormButton
+          buttonType='outline'
+          title='YOU GAVE'
+          textColor="#fff"
+          fontSize={12}
+          buttonColor='#BD3642'
+          onPress={() => props.navigation.navigate('AddAmount', { type: '1', contactid:props.getContactId })}
+        //loading={isSubmitting}
+        />
+      </View>
     </Left>
     <Right>
-      <FormButton
-        buttonType='outline'
-        title='You Got'
-        buttonColor='#6bbd0d'
-        onPress={() => props.navigation.navigate('AddAmount', { type: '2', contactid:props.getContactId })}
-      //loading={isSubmitting}
-      />
+      <View style={{width:'95%'}}>
+        <FormButton
+          buttonType='outline'
+          title='YOU GOT'
+          textColor="#fff"
+          buttonColor='#008648'
+          fontSize={12}
+          onPress={() => props.navigation.navigate('AddAmount', { type: '2', contactid:props.getContactId })}
+        //loading={isSubmitting}
+        />
+      </View>
     </Right>
   </View>
 )
@@ -97,7 +108,13 @@ export default class GetUserAmount extends Component {
     const { params } = navigation.state;
     return {
       headerLeft: params && params.contactDetails ? <ScreenLeft details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>,
-
+      headerStyle: {
+        backgroundColor: '#687DFC',
+        borderBottomWidth: 0,
+        shadowColor: 'transparent',
+        paddingTop:10,
+        paddingBottom:10
+      },
       headerRight: params && params.contactDetails ? <ScreenRight details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>,
     }
   };
@@ -177,7 +194,7 @@ export default class GetUserAmount extends Component {
     const { loading, contactAmount } = this.state
     return (
       <React.Fragment>
-        <SafeAreaView style={styles.container}>
+          <View style={[styles.commonSpace, styles.container]}>
           {contactAmount && contactAmount.length > 0 ? <Card style={styles.cardborder}>
             {contactAmount && contactAmount.map((items, i) => {
               return (
@@ -195,45 +212,19 @@ export default class GetUserAmount extends Component {
             })}
           </Card> :
 
-            <View>
-              <Text>No Records Found</Text>
+            <View style={[styles.commonSpace, {justifyContent: 'center', flex:1, alignItems:'center'}]}>
+              <Text>No transactions for contact</Text>
+              <Text style={{fontWeight:'bold', paddingTop:5}}>add a few</Text>
             </View>
           }
-          <AmountButtons navigation={this.props.navigation} getContactId={this.props.navigation.getParam('id', 'default')} />
-        </SafeAreaView>
+          </View>
+          <View style={{ marginTop:30, marginBottom:20, borderTopColor:'#ddd', borderTopWidth:1}}>
+            <View style={[styles.commonSpace, {paddingTop:20}]}>
+              <AmountButtons navigation={this.props.navigation} getContactId={this.props.navigation.getParam('id', 'default')} />
+            </View>
+          </View>
         {loading && <Loader />}
       </React.Fragment>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  buttonContainer: {
-    margin: 25
-  },
-  inputContainer: {
-    marginLeft: 15,
-    marginRight: 15
-  },
-  cardborder: {
-    borderWidth: 0
-  },
-  amountDebit: {
-    fontSize: 20,
-    color: 'red'
-  },
-  amountCredit: {
-    fontSize: 20,
-    color: 'green'
-  },
-  title: {
-    color: 'black'
-  },
-  headerbg: {
-    backgroundColor: '#fff'
-  }
-})

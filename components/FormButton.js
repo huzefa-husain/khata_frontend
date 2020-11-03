@@ -3,7 +3,7 @@ import { Text } from 'react-native'
 //import { Button } from 'react-native-elements'
 import { Button, Icon } from 'native-base';
 
-const FormButton = ({ title, buttonType, buttonColor,textColor,buttonstate,icon,iconName,iconType, ...rest }) => {
+const FormButton = ({ title, buttonType, buttonColor,textColor,buttonstate,icon,iconName,iconType, fontSize = 16, ...rest }) => {
   return (
     /*<Button
     {...rest}
@@ -13,7 +13,7 @@ const FormButton = ({ title, buttonType, buttonColor,textColor,buttonstate,icon,
     titleStyle={{ color: textColor, fontSize:16,paddingTop:10, paddingBottom:10 }}
   />*/
   <Button iconRight block large light {...rest} style={{backgroundColor:buttonColor, borderRadius: 5, borderColor: buttonColor}}>
-    <Text style={{color: textColor, fontSize:16}}>{title}</Text>
+    <Text style={{color: textColor, fontSize:fontSize}}>{title}</Text>
     {icon && <Icon type={iconType} name={iconName} style={{color:'#fff', fontSize:14, paddingLeft:10}} />}
   </Button>
   )
