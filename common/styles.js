@@ -30,12 +30,16 @@ const styles = StyleSheet.create({
     borderWidth: 0
   },
   amountDebit: {
-    fontSize: 20,
-    color: 'red'
+    fontSize: 14,
+    color: '#BD3642',
+    textAlign:'right',
+    fontWeight:'bold'
   },
   amountCredit: {
-    fontSize: 20,
-    color: 'green'
+    fontSize: 14,
+    color: '#008648',
+    textAlign:'right',
+    fontWeight:'bold'
   },
   title: {
     color: '#fff',

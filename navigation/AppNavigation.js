@@ -81,7 +81,9 @@ const DashboardStack = createStackNavigator({
   },
   AddKhata: { screen: AddKhata },
   AddContact: { screen: AddContact },
-  GetUserAmount: { screen: GetUserAmount }
+  GetUserAmount: { screen: GetUserAmount },
+  SelectAmount: { screen: SelectAmount },
+  AddAmount: { screen: AddAmount },
 });
 
 const AppNavigation = createBottomTabNavigator({

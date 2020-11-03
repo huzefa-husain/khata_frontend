@@ -8,9 +8,28 @@ import { api } from '../common/Api'
 import { baseurl, getuseramount, getcurrency } from '../common/Constant'
 
 const ScreenRight = props => {
-  const textDebit = "They'll Pay"
-  const textCredit = "They'll Recieve"
+  console.log (props)
+  const textDebit = "You will get"
+  const textCredit = "You will give"
   return (
+    <View>
+      {props.details &&
+        <View style={{ flexDirection: "row", marginLeft: 16, marginRight: 16, marginTop: 5,marginBottom: 5,padding: 20,backgroundColor: '#ffffff', borderRadius:3}}>
+        <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'left'}}>
+        {props.details.amountType !== null ? <React.Fragment>
+            <Text>
+              {props.details.amountType === "Pay" ? textDebit : textCredit}
+            </Text>
+          </React.Fragment> : <React.Fragment></React.Fragment>}
+        </View>
+        <View style={{ flex: 1, justifyContent: 'flex-end', alignContent: 'right' }}>
+          <Text style={props.details.amountType === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.details.amount !== null ? props.details.amount + ' ' + getcurrency : ''}</Text>
+        </View>
+        </View>
+      }
+    </View>
+  )
+  /*return (
     <View>
       {props.details &&
         <View>
@@ -23,7 +42,7 @@ const ScreenRight = props => {
         </View>
       }
     </View>
-  )
+  )*/
 }
 
 const ScreenLeft = props => {
@@ -100,7 +119,8 @@ export default class GetUserAmount extends Component {
     super(props);
     this.state = {
       loading: false,
-      contactAmount: null
+      contactAmount: null,
+      contactDetails: null
     }
   }
 
@@ -115,7 +135,7 @@ export default class GetUserAmount extends Component {
         paddingTop:10,
         paddingBottom:10
       },
-      headerRight: params && params.contactDetails ? <ScreenRight details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>,
+      //headerRight: params && params.contactDetails ? <ScreenRight details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>,
     }
   };
 
@@ -154,7 +174,8 @@ export default class GetUserAmount extends Component {
         })*/
         this.setState({
           loading: false,
-          contactAmount: response.data.contactamount
+          contactAmount: response.data.contactamount,
+          contactDetails: response.data.contactdetails
         });
         this.props.navigation.setParams({
           contactDetails:response.data.contactdetails,
@@ -191,11 +212,17 @@ export default class GetUserAmount extends Component {
   }
 
   render() {
-    const { loading, contactAmount } = this.state
+    const { loading, contactAmount, contactDetails } = this.state
+    const getContactId = this.props.navigation.getParam('id', 'default')
     return (
       <React.Fragment>
-          <View style={[styles.commonSpace, styles.container]}>
-          {contactAmount && contactAmount.length > 0 ? <Card style={styles.cardborder}>
+          <View style={[styles.container]}>
+          {contactAmount && contactAmount.length > 0 ? <React.Fragment> 
+          <View style={{backgroundColor:'#687DFC', paddingBottom:20, paddingTop:20}}>
+            <ScreenRight details={contactDetails} contactid={getContactId} />
+          </View>
+          <View style={[styles.commonSpace]}>
+          <Card style={[styles.cardborder]}>
             {contactAmount && contactAmount.map((items, i) => {
               return (
                 <CardItem button key={i} onPress={() => this.props.navigation.navigate('AddAmount', { 
@@ -210,7 +237,8 @@ export default class GetUserAmount extends Component {
                 </CardItem>
               );
             })}
-          </Card> :
+          </Card>
+          </View></React.Fragment> :
 
             <View style={[styles.commonSpace, {justifyContent: 'center', flex:1, alignItems:'center'}]}>
               <Text>No transactions for contact</Text>
