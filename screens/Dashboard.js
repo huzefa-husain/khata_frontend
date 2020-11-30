@@ -14,6 +14,7 @@ import { Picker } from "native-base";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 
 const HeaderTitle = props => {
+  //console.log (props)
   return (
     <React.Fragment>
       <View style={{paddingLeft:16, paddingTop:10}}>   
@@ -49,6 +50,7 @@ const DropDown = props => {
   //console.log (props.action)
   const navigation = props.nav;
   let initvalue = 'key1'
+  const dropdownClick = 'dropclicked'
   return (
     <React.Fragment>
         {<Menu>
@@ -66,8 +68,10 @@ const DropDown = props => {
               props.khatadata && props.khatadata.map((list, i) => {
                 return (
                   <MenuOption key={i} value={list.name}>
-                    <Text onPress={() => 
-                      props.action(list.name,list.id,list.businessname,list.type)
+                    <Text onPress={() => {
+                      //console.log (list)
+                      props.action(list, dropdownClick)
+                    }
                       }>{list.name}</Text>
                   </MenuOption>
                 );
@@ -134,7 +138,8 @@ class Dashboard extends React.Component {
     this.focusListner = this.props.navigation.addListener("didFocus",() => {
       this.props.navigation.setParams({ dropButton: this._dropButton });
       // Update your data
-      this.multiGet();
+      this.getKhataList();
+      //this.multiGet();
     });
   }
 
@@ -151,13 +156,13 @@ class Dashboard extends React.Component {
       let typeID = response[3][1]
       //console.log(response)
       //console.log(value, khataid, businessname, typeID)
-      this.getDashboard(value, khataid, businessname, typeID);
+      //this.getDashboard(value, khataid, businessname, typeID);
     }).catch(function (error) {
       console.log(error);
     });
   }
 
-  setParam = async (value, khataid, businessname, typeID, khatadata) => {
+  /*setParam = async (value, khataid, businessname, typeID, khatadata) => {
     const items = [['khataName', value], ['KhataId', khataid], ['businessName', businessname], ['TypeId', typeID], ]
       AsyncStorage.multiGet(items).then(response => {  
         const getKhataName = response[0][0][1];
@@ -176,13 +181,128 @@ class Dashboard extends React.Component {
     }).catch(function (error) {
       console.log(error);
     });
+
+  }*/
+
+  setParam = async (response) => {
+    
+      //console.log (response.data.khatalist)
+      const getKhataName = response.khataName;
+      const getKhataId= response.KhataId;
+      const getBusinessName = response.businessName;
+      const getTypeId = response.TypeId;
+      const getKhataData = response.KhataData
+
+      //console.log (response)
+
+      this.props.navigation.setParams({
+        screenTitle: getKhataName,
+        businessName: getBusinessName,
+        typeId:getTypeId,
+        khataId:getKhataId,
+        screenData:getKhataData,
+        screenNav:this.props.navigation.navigate
+      })
+      //this.getDashboard()
   }
 
-  _dropButton = async (value, khataid, businessname, typeID) => {
-    this.getDashboard(value, khataid, businessname, typeID);
+  _dropButton = async (list, dropdownClick) => {
+    this.getDashboard(list, dropdownClick);
   }
 
-  getDashboard = async ( value, khataid, businessname,  typeID) => {
+  getKhataList = async () => {
+    /*let keys = ['KhataId', 'khataName','businessName', 'TypeId'];
+    AsyncStorage.multiRemove(keys, (err) => {
+        console.log('Local storage user info removed!');
+    });*/
+    const khataId = await AsyncStorage.getItem('KhataId');
+    console.log ('khataId',khataId)
+    if (khataId !== null) {
+      //console.log (khataId)
+      this.getDashboard(null, khataId);
+    } else {
+      console.log ('else')
+      api(null, "https://api.tastezeal.in/khatalist?userid=10", 'GET', null).then(async (response)=>{
+      if (response.data.success === 1) {
+        //await AsyncStorage.setItem('KhataId', response.data.khatalist[0].id);
+        await AsyncStorage.multiSet([
+          ["KhataId", response.data.khatalist[0].id],
+          ["khataName", response.data.khatalist[0].name],
+          ["businessName", response.data.khatalist[0].businessname],
+          ["TypeId", response.data.khatalist[0].type]
+        ])
+        const khataId = await AsyncStorage.getItem('KhataId');
+        console.log (khataId)
+        this.getDashboard(null, khataId);
+      } else {
+        alert (response.data.message)
+      }
+    }).catch(function (error) {
+      console.log(error);
+    });
+    }
+  }
+
+  getDashboard = async ( list, khataIdResponse) => {
+    const userToken = await AsyncStorage.getItem('userId');
+    const khataId = list !== null ? list.id : khataIdResponse
+    const postBody = {
+      userid:userToken,
+      khataid: khataId,
+    }
+    this.setState({
+      loading: true,
+    });
+    //console.log ('for api',khataId)
+    api(postBody, baseurl + dashboard, 'POST', null).then(async (response)=>{
+      //console.log ('dashboard response',response)
+      this.setState({
+        khataData: response.data.khatalist,
+        khataContact:response.data.contactlist,
+        totalAmount:response.data.totalamount[0],
+        loading:false
+      });
+
+      if (list) {
+        await AsyncStorage.multiSet([
+          ["KhataId", list.id],
+          ["khataName", list.name],
+          ["businessName", list.businessname],
+          ["TypeId", list.type]
+        ])
+      }
+      
+      const KhataId = await AsyncStorage.getItem('KhataId');
+      const khataName = await AsyncStorage.getItem('khataName');
+      const businessName = await AsyncStorage.getItem('businessName');
+      const TypeId = await AsyncStorage.getItem('TypeId');
+      const responseJson = {
+        khataName:khataName,
+        KhataId:KhataId,
+        businessName:businessName,
+        TypeId:TypeId,
+        KhataData:this.state.khataData
+      }
+      this.setParam(responseJson);
+      if (response.data.khatalist) {
+        /*const responseJson = {
+          khataName:response.data.khatalist[0].name,
+          KhataId:response.data.khatalist[0].id,
+          businessName:response.data.khatalist[0].businessname,
+          TypeId:response.data.khatalist[0].type,
+          KhataData:this.state.khataData
+        }*/
+        this.setParam(responseJson);
+      } else {
+        alert (response.data.message)
+      }
+
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+
+  /*getDashboard = async ( value, khataid, businessname,  typeID) => {
     const userToken = await AsyncStorage.getItem('userId');
     const postBody = {
       userid:userToken,
@@ -224,7 +344,7 @@ class Dashboard extends React.Component {
     }).catch(function (error) {
       console.log(error);
     });
-  };
+  };*/
 
   getSuggestions = async (searchTerm) => {
     const userToken = await AsyncStorage.getItem('userId');
@@ -272,7 +392,7 @@ class Dashboard extends React.Component {
           <View>
             <DebouncedInput debounceTime={1000} callback={this.getSuggestions} placeholder='Search' Font={'12'}/>
           </View>
-            <Totals totalAmount={totalAmount}/>
+            {<Totals totalAmount={totalAmount}/>}
           </View>
           {totalAmount && totalAmount.contactcount === "0" ? 
           <View style={[styles.commonSpace, {justifyContent: 'center', flex:1, alignItems:'center'}]}>
@@ -282,7 +402,7 @@ class Dashboard extends React.Component {
            : 
           <View style={[styles.commonSpace]}>
             <ContactList data={khataContact} navigation={this.props.navigation} contactCount={totalAmount && totalAmount.contactcount} />
-          </View> 
+          </View>
           }
           
           <View style={{ paddingLeft:20, paddingRight:20, marginTop:30, marginBottom:20}}>
