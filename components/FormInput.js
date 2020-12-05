@@ -10,6 +10,7 @@ const FormInput = ({
   keyboardType,
   name,
   placeholder,
+  placeholderTextColor='#ACACAC',
   ...rest
 }) => (
   <View style={styles.inputContainer}>
@@ -17,7 +18,7 @@ const FormInput = ({
       {...rest}
       //leftIcon={<Ionicons name={iconName} size={28} color={iconColor} style={{padding:0}} />}
       leftIconContainerStyle={styles.iconStyle}
-      placeholderTextColor='grey'
+      placeholderTextColor={placeholderTextColor}
       name={name}
       placeholder={placeholder}
       keyboardType={keyboardType}

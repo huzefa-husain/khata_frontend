@@ -22,7 +22,7 @@ class ContactList extends React.Component {
             return (
               <TouchableOpacity key={i} onPress={() => this.props.navigation.navigate('GetUserAmount', { id: items.id })}>
               <Card  style={{paddingBottom:5, paddingTop:5, borderRadius:5}}>
-              <CardItem onPress={() => console.log ('working')} >
+              <CardItem>
                 <View style={{flex: 1, flexDirection: 'row',justifyContent: 'space-between'}}>
                   <View style={{justifyContent: 'center', fontWeight:'bold'}} >
                     <Text style={{fontWeight:'bold'}}>{items.name}</Text>

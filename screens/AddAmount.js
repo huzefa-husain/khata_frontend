@@ -4,10 +4,11 @@ import { DatePicker } from 'native-base';
 import moment from "moment";
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import { styles } from '../common/styles'
 import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
-import ScreenHeader from '../components/ScreenHeader'
+//import ScreenHeader from '../components/ScreenHeader'
 import Delete from '../components/Delete'
 import Loader from '../components/Loader'
 import { api } from '../common/Api'
@@ -20,6 +21,17 @@ const validationSchema = Yup.object().shape({
   amount: Yup.number().min(1, 'Must have at least 1 characters'),
 })
 
+const colorRed = '#BD3642'
+const colorGreen = '#008648'
+
+const ScreenHeader = ({title,screenColor}) => (
+  <View>
+      <React.Fragment>
+        <Text style={{fontWeight:'bold', color:screenColor}}>{title}</Text>
+      </React.Fragment>
+  </View>
+)
+
 export default class AddAmount extends Component {
   constructor(props) {
     super(props);
@@ -27,16 +39,18 @@ export default class AddAmount extends Component {
       loading: false,
       chosenDate: moment(new Date()).format("YYYY-MM-DD"),
       mode:this.props.navigation.getParam('mode','default'),
-      data:this.props.navigation.getParam('items','default')
+      data:this.props.navigation.getParam('items','default'),
+      formcolorprop:this.props.navigation.getParam('type','default')
     }
   }
 
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
     return {
-      headerTitle: params ? <ScreenHeader mode={params.screenEdit} title={'Amount'}/> : <React.Fragment></React.Fragment>,
+      headerTitle: params ? <ScreenHeader screenColor={params.screenColor === '1' ? colorRed : colorGreen} title={params.screenColor === '1' ? 'YOU GAVE' : 'YOU GOT'} /> : <React.Fragment></React.Fragment>,
       headerRight: params ? <Delete action={params.deleteButton} mode={params.screenEdit} /> : <React.Fragment></React.Fragment>,
       headerBackTitleVisible: false,
+      headerTintColor: params.screenColor === '1' ? colorRed : colorGreen
     }
   };
 
@@ -45,6 +59,7 @@ export default class AddAmount extends Component {
     this.focusListner = this.props.navigation.addListener("didFocus",() => {
       this.props.navigation.setParams({
         screenEdit:this.state.mode,
+        screenColor:this.state.formcolorprop
       })
       console.log ('items',this.state.data)
     });
@@ -126,7 +141,8 @@ export default class AddAmount extends Component {
   }
 
   render() {
-    const { mode, data, loading, chosenDate } = this.state
+    const { mode, data, loading, chosenDate, formcolorprop } = this.state
+    const colorCode = formcolorprop === '1' ? colorRed : colorGreen
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -150,55 +166,66 @@ export default class AddAmount extends Component {
               isSubmitting
             }) => (
                 <Fragment>
-                  <FormInput
-                    name='amount'
-                    value={values.amount}
-                    onChangeText={handleChange('amount')}
-                    placeholder='Enter Amount'
-                    iconName='ios-phone-portrait'
-                    iconColor='#2C384A'
-                    onBlur={handleBlur('amount')}
-                    keyboardType={'number-pad'}
-                    returnKeyType={'next'}
-                  //autoFocus
-                  />
+                  <View style={styles.boxcontainerspace}>
+                    <View style={{borderColor: '#ccc',borderWidth: 1,paddingTop:8, paddingBottom:8}}>
+                      <FormInput
+                        name='amount'
+                        value={values.amount}
+                        onChangeText={handleChange('amount')}
+                        placeholder='00 KD'
+                        iconName='ios-phone-portrait'
+                        iconColor='#2C384A'
+                        onBlur={handleBlur('amount')}
+                        keyboardType={'number-pad'}
+                        returnKeyType={'next'}
+                        placeholderTextColor={colorCode}
+                        //autoFocus
+                      />
+                    </View>
                   <ErrorMessage errorValue={touched.amount && errors.amount} />
-                  <FormInput
-                    name='notes'
-                    value={values.notes}
-                    onChangeText={handleChange('notes')}
-                    placeholder='Notes'
-                    iconName='md-person'
-                    iconColor='#2C384A'
-                    onBlur={handleBlur('notes')}
-                  //autoFocus
-                  />
-                  <ErrorMessage errorValue={touched.notes && errors.notes} />
-                  <DatePicker
-                    defaultDate={new Date(2018, 4, 4)}
-                    minimumDate={new Date(2018, 1, 1)}
-                    maximumDate={new Date(2018, 12, 31)}
-                    locale={"en"}
-                    timeZoneOffsetInMinutes={undefined}
-                    modalTransparent={false}
-                    animationType={"fade"}
-                    androidMode={"default"}
-                    placeHolderText="Select date"
-                    textStyle={{ color: "green" }}
-                    placeHolderTextStyle={{ color: "#d3d3d3" }}
-                    onDateChange={this.setDate}
-                    disabled={false}
-                    formatChosenDate={date => {return moment(date).format('YYYY-MM-DD');}}
+                  <View style={{borderColor: '#ccc',borderWidth: 1,paddingTop:8, paddingBottom:8}}>
+                    <FormInput
+                      name='notes'
+                      value={values.notes}
+                      onChangeText={handleChange('notes')}
+                      placeholder='Enter Notes'
+                      iconName='md-person'
+                      iconColor='#2C384A'
+                      onBlur={handleBlur('notes')}
+                    //autoFocus
                     />
+                  </View>
+                  <ErrorMessage errorValue={touched.notes && errors.notes} />
+                  <View style={{borderColor: '#ccc',borderWidth: 1,paddingTop:8, paddingBottom:8}}>
+                    <DatePicker
+                      defaultDate={new Date(2018, 4, 4)}
+                      minimumDate={new Date(2018, 1, 1)}
+                      maximumDate={new Date(2018, 12, 31)}
+                      locale={"en"}
+                      timeZoneOffsetInMinutes={undefined}
+                      modalTransparent={false}
+                      animationType={"fade"}
+                      androidMode={"default"}
+                      placeHolderText="Enter Date"
+                      textStyle={{ color: "green" }}
+                      placeHolderTextStyle={{ color: "#ACACAC", fontSize:18 }}
+                      onDateChange={this.setDate}
+                      disabled={false}
+                      formatChosenDate={date => {return moment(date).format('YYYY-MM-DD');}}
+                      />
+                  </View>
                     <Text>
                       Date: {chosenDate}
                     </Text>
+                  
+                  </View>
                   <View style={styles.buttonContainer}>
                     <FormButton
                       buttonType='outline'
                       onPress={handleSubmit}
                       title='Save'
-                      buttonColor='#F57C00'
+                      textColor= '#ffffff'
+                      buttonColor={colorCode}
                       disabled={!isValid || isSubmitting}
                     //loading={isSubmitting}
                     />
@@ -214,7 +241,7 @@ export default class AddAmount extends Component {
   }
 }
 
-const styles = StyleSheet.create({
+/*const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff'
@@ -226,4 +253,4 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginRight: 15
   }
-})
+})*/

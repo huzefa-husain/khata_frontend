@@ -13,10 +13,12 @@ const styles = StyleSheet.create({
   boxcontainer: {
     borderColor: '#ccc',
     borderWidth: 1,
-    padding: '25px',
     margin: 25,
     padding: 0,
     borderRadius: 5
+  },
+  boxcontainerspace: {
+    margin: 25,
   },
   inputDivider: {
     borderBottomColor: '#ccc',
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
     paddingLeft:20, paddingRight:20
   },
   cardborder: {
-    borderWidth: 0
+    //borderWidth: 0,
   },
   amountDebit: {
     fontSize: 14,

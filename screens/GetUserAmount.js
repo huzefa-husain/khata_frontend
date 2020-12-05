@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { View, Text, AsyncStorage, TouchableOpacity } from 'react-native'
-import { Card, CardItem, Right, Title, Subtitle, Left, Icon } from 'native-base';
+import { Card, CardItem, Right, Title, Subtitle, Left, Icon, ListItem, Body } from 'native-base';
+import { Col, Row, Grid } from "react-native-easy-grid";
 import { styles } from '../common/styles'
 import FormButton from '../components/FormButton'
 import Loader from '../components/Loader'
@@ -8,7 +9,7 @@ import { api } from '../common/Api'
 import { baseurl, getuseramount, getcurrency } from '../common/Constant'
 
 const ScreenRight = props => {
-  console.log (props)
+  //console.log (props)
   const textDebit = "You will get"
   const textCredit = "You will give"
   return (
@@ -17,8 +18,8 @@ const ScreenRight = props => {
         <View style={{ flexDirection: "row", marginLeft: 16, marginRight: 16, marginTop: 5,marginBottom: 5,padding: 20,backgroundColor: '#ffffff', borderRadius:3}}>
         <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'left'}}>
         {props.details.amountType !== null ? <React.Fragment>
-            <Text>
-              {props.details.amountType === "Pay" ? textDebit : textCredit}
+            <Text style={{fontWeight:'bold'}}>
+             {props.details.amountType === "Pay" ? textDebit : textCredit}
             </Text>
           </React.Fragment> : <React.Fragment></React.Fragment>}
         </View>
@@ -29,20 +30,6 @@ const ScreenRight = props => {
       }
     </View>
   )
-  /*return (
-    <View>
-      {props.details &&
-        <View>
-          <Text style={props.details.amountType === "Pay" ? styles.amountDebit : styles.amountCredit}>{props.details.amount !== null ? props.details.amount + getcurrency : ''}</Text>
-          {props.details.amountType !== null ? <React.Fragment>
-            <Text>
-              {props.details.amountType === "Pay" ? textDebit : textCredit}
-            </Text>
-          </React.Fragment> : <React.Fragment></React.Fragment>}
-        </View>
-      }
-    </View>
-  )*/
 }
 
 const ScreenLeft = props => {
@@ -93,7 +80,7 @@ const AmountButtons = (props) => (
           textColor="#fff"
           fontSize={12}
           buttonColor='#BD3642'
-          onPress={() => props.navigation.navigate('AddAmount', { type: '1', contactid:props.getContactId })}
+          onPress={() => props.navigation.navigate('AddAmount', { type: '1', contactid:props.getContactId, color:'#BD3642' })}
         //loading={isSubmitting}
         />
       </View>
@@ -106,7 +93,7 @@ const AmountButtons = (props) => (
           textColor="#fff"
           buttonColor='#008648'
           fontSize={12}
-          onPress={() => props.navigation.navigate('AddAmount', { type: '2', contactid:props.getContactId })}
+          onPress={() => props.navigation.navigate('AddAmount', { type: '2', contactid:props.getContactId, color:'green' })}
         //loading={isSubmitting}
         />
       </View>
@@ -135,6 +122,8 @@ export default class GetUserAmount extends Component {
         paddingTop:10,
         paddingBottom:10
       },
+      headerBackTitleVisible: false,
+      headerBackTitle: null,
       //headerRight: params && params.contactDetails ? <ScreenRight details={params.contactDetails} contactid={params.contactid} nav={params.screenNav}/> : <React.Fragment></React.Fragment>,
     }
   };
@@ -148,7 +137,7 @@ export default class GetUserAmount extends Component {
   }
 
   getAmount = async (values) => {
-    console.log(values)
+    //console.log(values)
     let self = this;
     const userToken = await AsyncStorage.getItem('userId');
     const apiurl = getuseramount
@@ -161,11 +150,11 @@ export default class GetUserAmount extends Component {
       contactid: getContactId,
     }
 
-    console.log(addBody)
+    //console.log(addBody)
     this.setState({
       loading: true,
     });
-    console.log(addBody)
+    //console.log(addBody)
     api(addBody, baseurl + apiurl, apimethod, null).then(async (response) => {
       if (response.data.success === 1) {
         console.log(response);
@@ -222,9 +211,10 @@ export default class GetUserAmount extends Component {
             <ScreenRight details={contactDetails} contactid={getContactId} />
           </View>
           <View style={[styles.commonSpace]}>
-          <Card style={[styles.cardborder]}>
+          {/*<Card style={[styles.cardborder]}>
             {contactAmount && contactAmount.map((items, i) => {
               return (
+                <View style={{marginBottom:5, marginTop:5}}>
                 <CardItem button key={i} onPress={() => this.props.navigation.navigate('AddAmount', { 
                   items:items,
                   mode:'edit'
@@ -235,9 +225,72 @@ export default class GetUserAmount extends Component {
                       <Text>{items.note}</Text>
                     </View>
                 </CardItem>
+                </View>
               );
             })}
-          </Card>
+          </Card>*/}
+          <View style={{flexDirection: 'row',justifyContent: 'space-between', paddingTop:15, paddingBottom:15}}>
+            <View style={{width:'40%'}}>
+                <Text style={{fontSize:14}}>ENTRIES</Text>
+            </View>
+            <View style={{width:'30%'}}>
+              <Text style={{fontSize:14, textAlign:'center'}}>YOU GAVE</Text>
+            </View>
+            <View style={{width:'30%'}}>
+              <Text style={{fontSize:14, textAlign:'center'}}>YOU GOT</Text>
+            </View>
+          </View>
+          {contactAmount && contactAmount.map((items, i) => {
+              console.log (items.type === "2" ? 'credit' : 'debit')
+              return (
+                <TouchableOpacity key={i} onPress={() => this.props.navigation.navigate('AddAmount', { 
+                  items:items,
+                  mode:'edit'
+                })}>
+                <View key={i} style={{paddingTop:15, paddingBottom:15, backgroundColor: '#fff',shadowOpacity: 0.22,shadowRadius: 2.22,shadowColor: "#000",elevation: 3,shadowOffset: {width: 0,height: 1,}, marginBottom:10}}>
+                {
+                  <View style={{flexDirection: 'row',justifyContent: 'space-between'}}>
+                  <View style={{width:'40%', paddingLeft:15}}>
+                      <Text style={{fontSize:14}}>{items.createddate}</Text>
+                  </View>
+                  <View style={{width:'30%'}}>
+                    <Text style={items.type === "2" ? {color:'red',textAlign:'center' } : {color:'green'}}>
+                        {items.type === "2" ? items.amount : ''}
+                    </Text>
+                  </View>
+                  <View style={{width:'30%'}}>
+                    <Text style={items.type === "2" ? {color:'red'} : {color:'green', textAlign:'center'}}>
+                        {items.type === "1" ? items.amount : ''}
+                    </Text>
+                  </View>
+                </View>
+                }
+                </View>
+                </TouchableOpacity>
+              );
+            })}
+            {/*contactAmount && contactAmount.map((items, i) => {
+              return (
+                <TouchableOpacity key={i} onPress={() => this.props.navigation.navigate('AddAmount', { 
+                  items:items,
+                  mode:'edit'
+                })}>
+                <Card  style={{paddingBottom:5, paddingTop:5, borderRadius:5}}>
+                <View style={{marginBottom:5, marginTop:5}}>
+                <CardItem>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center',alignItems: 'flex-end'}}>
+                      <Text>{items.createddate}</Text>
+                      <Text style={styles.amount}>{items.amount}</Text>
+                      {<Text>{items.note}</Text>}
+                    </View>
+                </CardItem>
+                </View>
+                </Card>
+                </TouchableOpacity>
+              );
+            })*/}
+          
+          
           </View></React.Fragment> :
 
             <View style={[styles.commonSpace, {justifyContent: 'center', flex:1, alignItems:'center'}]}>
