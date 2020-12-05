@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     paddingTop:15
   },
   commonSpace:{
-    paddingLeft:20, paddingRight:20
+    paddingLeft:20, paddingRight:20, backgroundColor:'#F5F5F5'
   },
   cardborder: {
     //borderWidth: 0,

@@ -210,25 +210,7 @@ export default class GetUserAmount extends Component {
           <View style={{backgroundColor:'#687DFC', paddingBottom:20, paddingTop:20}}>
             <ScreenRight details={contactDetails} contactid={getContactId} />
           </View>
-          <View style={[styles.commonSpace]}>
-          {/*<Card style={[styles.cardborder]}>
-            {contactAmount && contactAmount.map((items, i) => {
-              return (
-                <View style={{marginBottom:5, marginTop:5}}>
-                <CardItem button key={i} onPress={() => this.props.navigation.navigate('AddAmount', { 
-                  items:items,
-                  mode:'edit'
-                })}>
-                    <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center',alignItems: 'flex-end'}}>
-                      <Text style={styles.amount}>{items.amount}</Text>
-                      <Text>{items.createddate}</Text>
-                      <Text>{items.note}</Text>
-                    </View>
-                </CardItem>
-                </View>
-              );
-            })}
-          </Card>*/}
+          <View style={[styles.commonSpace,{flex:1}]}>
           <View style={{flexDirection: 'row',justifyContent: 'space-between', paddingTop:15, paddingBottom:15}}>
             <View style={{width:'40%'}}>
                 <Text style={{fontSize:14}}>ENTRIES</Text>
@@ -269,28 +251,6 @@ export default class GetUserAmount extends Component {
                 </TouchableOpacity>
               );
             })}
-            {/*contactAmount && contactAmount.map((items, i) => {
-              return (
-                <TouchableOpacity key={i} onPress={() => this.props.navigation.navigate('AddAmount', { 
-                  items:items,
-                  mode:'edit'
-                })}>
-                <Card  style={{paddingBottom:5, paddingTop:5, borderRadius:5}}>
-                <View style={{marginBottom:5, marginTop:5}}>
-                <CardItem>
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center',alignItems: 'flex-end'}}>
-                      <Text>{items.createddate}</Text>
-                      <Text style={styles.amount}>{items.amount}</Text>
-                      {<Text>{items.note}</Text>}
-                    </View>
-                </CardItem>
-                </View>
-                </Card>
-                </TouchableOpacity>
-              );
-            })*/}
-          
-          
           </View></React.Fragment> :
 
             <View style={[styles.commonSpace, {justifyContent: 'center', flex:1, alignItems:'center'}]}>
@@ -299,8 +259,8 @@ export default class GetUserAmount extends Component {
             </View>
           }
           </View>
-          <View style={{ marginTop:30, marginBottom:20, borderTopColor:'#ddd', borderTopWidth:1}}>
-            <View style={[styles.commonSpace, {paddingTop:20}]}>
+          <View style={{ paddingTop:30, paddingBottom:20, borderTopColor:'#ddd', borderTopWidth:1}}>
+            <View style={[styles.commonSpace, {}]}>
               <AmountButtons navigation={this.props.navigation} getContactId={this.props.navigation.getParam('id', 'default')} />
             </View>
           </View>
